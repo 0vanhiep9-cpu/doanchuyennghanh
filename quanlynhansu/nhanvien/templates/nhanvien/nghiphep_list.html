@@ -1,0 +1,84 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 uppercase">Quản Lý Nghỉ Phép</h2>
+            <p class="text-gray-500 text-sm">Danh sách đơn xin nghỉ phép của nhân viên</p>
+        </div>
+        <a href="{% url 'them_nghiphep' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 shadow-sm">
+            <i data-lucide="plus" class="w-5 h-5"></i> Tạo Đơn Mới
+        </a>
+    </div>
+
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex gap-4 items-center">
+        <span class="text-sm font-medium text-gray-700">Trạng thái:</span>
+        <a href="?trangthai=" class="px-3 py-1 rounded-full text-sm {% if not trangthai_filter %}bg-blue-100 text-blue-700 font-bold{% else %}bg-gray-100 text-gray-600{% endif %}">Tất cả</a>
+        <a href="?trangthai=Đang chờ" class="px-3 py-1 rounded-full text-sm {% if trangthai_filter == 'Đang chờ' %}bg-yellow-100 text-yellow-700 font-bold{% else %}bg-gray-100 text-gray-600{% endif %}">Đang chờ</a>
+        <a href="?trangthai=Đã duyệt" class="px-3 py-1 rounded-full text-sm {% if trangthai_filter == 'Đã duyệt' %}bg-green-100 text-green-700 font-bold{% else %}bg-gray-100 text-gray-600{% endif %}">Đã duyệt</a>
+        <a href="?trangthai=Từ chối" class="px-3 py-1 rounded-full text-sm {% if trangthai_filter == 'Từ chối' %}bg-red-100 text-red-700 font-bold{% else %}bg-gray-100 text-gray-600{% endif %}">Từ chối</a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-800 text-white">
+                    <tr>
+                        <th class="p-3">MSNV</th>
+                        <th class="p-3">Họ Tên</th>
+                        <th class="p-3 text-center">Từ Ngày</th>
+                        <th class="p-3 text-center">Đến Ngày</th>
+                        <th class="p-3">Lý Do</th>
+                        <th class="p-3 text-center">Trạng Thái</th>
+                        {% if vaitro == 'Admin' or vaitro == 'QuanLy' %}
+                        <th class="p-3 text-center">Duyệt Đơn</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for don in ds_nghiphep %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3 font-medium">{{ don.manhanvien.manhanvien }}</td>
+                        <td class="p-3">{{ don.manhanvien.hoten }}</td>
+                        <td class="p-3 text-center text-gray-600">{{ don.ngaybatdau|date:"d/m/Y" }}</td>
+                        <td class="p-3 text-center text-gray-600">{{ don.ngayketthuc|date:"d/m/Y" }}</td>
+                        <td class="p-3 text-gray-600 max-w-xs truncate" title="{{ don.lydo }}">{{ don.lydo }}</td>
+                        <td class="p-3 text-center">
+                            {% if don.trangthai == 'Đang chờ' %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">Đang chờ</span>
+                            {% elif don.trangthai == 'Đã duyệt' %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Đã duyệt</span>
+                            {% else %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">Từ chối</span>
+                            {% endif %}
+                        </td>
+                        
+                        {% if vaitro == 'Admin' or vaitro == 'QuanLy' %}
+                        <td class="p-3 text-center">
+                            {% if don.trangthai == 'Đang chờ' %}
+                            <div class="flex justify-center gap-2">
+                                <a href="{% url 'duyet_nghiphep' don.manghiphep 'Đã duyệt' %}" class="p-1 bg-green-100 text-green-600 rounded hover:bg-green-200" title="Chấp thuận">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                </a>
+                                <a href="{% url 'duyet_nghiphep' don.manghiphep 'Từ chối' %}" class="p-1 bg-red-100 text-red-600 rounded hover:bg-red-200" title="Từ chối">
+                                    <i data-lucide="x" class="w-4 h-4"></i>
+                                </a>
+                            </div>
+                            {% else %}
+                            <span class="text-xs text-gray-400 italic">Đã xử lý</span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-gray-500">Không có đơn nghỉ phép nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

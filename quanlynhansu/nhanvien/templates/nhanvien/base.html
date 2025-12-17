@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRM Pro - Quản Lý Nhân Sự</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden transition-opacity"></div>
+
+    <div class="min-h-screen flex font-sans">
+        <aside id="sidebar" class="fixed top-0 left-0 z-30 h-full w-64 bg-[#1e293b] text-white transition-transform duration-300 -translate-x-full lg:static lg:translate-x-0 shadow-xl">
+            <div class="h-full flex flex-col">
+                <div class="p-6 border-b border-slate-700/50">
+                    <a href="{% url 'dashboard_router' %}" class="text-2xl font-black text-white flex items-center gap-2">
+                        <i data-lucide="database" class="w-6 h-6 text-blue-400"></i>
+                        HRM Pro
+                    </a>
+                </div>
+
+                <nav class="flex-1 overflow-y-auto px-4 py-6 space-y-1">
+                    
+                    <a href="{% url 'dashboard_router' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Dashboard</span>
+                    </a>
+
+                    {% if user.is_superuser or user.vaitro == 'QuanLy' %}
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-400 uppercase">Quản Lý Tổng Thể</div>
+                    <a href="{% url 'danh_sach_nhan_vien' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="list-ordered" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Danh Sách Nhân Sự</span>
+                    </a>
+                    <a href="{% url 'quanly_phong_ban' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="building-2" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Phòng Ban & Chức Vụ</span>
+                    </a>
+                    {% if user.is_superuser %}
+                    <a href="{% url 'quan_ly_phe_duyet_tai_khoan' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="user-check" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Phê Duyệt Tài Khoản</span>
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'danh_sach_hop_dong' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Quản Lý Hợp Đồng</span>
+                    </a>
+                    <a href="{% url 'tuyendung_list' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Vị Trí Tuyển Dụng</span>
+                    </a>
+                    <a href="{% url 'danh_sach_ung_vien' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Danh Sách Ứng Viên</span>
+                    </a>
+                    {% endif %}
+
+                    {% if user.is_superuser %}
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-400 uppercase">Quản Lý Tài Chính</div>
+                    <a href="{% url 'quanly_luong' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="banknote" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Quản Lý Lương CB</span>
+                    </a>
+                    <a href="{% url 'tinh_luong_payroll' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="calculator" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Tính Lương (Payroll)</span>
+                    </a>
+                    <a href="{% url 'quan_ly_chuyen_khoan_luong' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Chuyển Khoản Lương</span>
+                    </a>
+                    {% endif %}
+
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-400 uppercase">Cá Nhân</div>
+                    <a href="{% url 'ho_so_ca_nhan' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="user-cog" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Hồ Sơ Cá Nhân</span>
+                    </a>
+                    <a href="{% url 'chamcong_list' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="clock" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Chấm Công</span>
+                    </a>
+                    
+                    {# ĐÃ SỬA: Đổi thành URL 'luong_ca_nhan' để khác với 'tinh_luong_payroll' #}
+                    <a href="{% url 'luong_ca_nhan' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="wallet" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Bảng Lương</span>
+                    </a>
+
+                    <a href="{% url 'nghiphep_list' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Đơn Nghỉ Phép</span>
+                    </a>
+
+                    <!-- Tính năng mới cho nhân viên -->
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-400 uppercase">Thông Tin Công Ty</div>
+                    <a href="{% url 'nhanvien_xem_phong_ban' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="building-2" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Danh Sách Phòng Ban</span>
+                    </a>
+                    <a href="{% url 'nhanvien_xem_dong_nghiep' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Danh Sách Đồng Nghiệp</span>
+                    </a>
+                    <a href="{% url 'nhanvien_xem_tuyen_dung' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Thông Tin Tuyển Dụng</span>
+                    </a>
+                    <a href="{% url 'nhanvien_xem_khen_thuong_ky_luat' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="award" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Khen Thưởng/Kỷ Luật</span>
+                    </a>
+                    <a href="{% url 'lich_su_chuyen_khoan' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-slate-300 hover:bg-slate-700/70">
+                        <i data-lucide="history" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Lịch Sử Chuyển Khoản</span>
+                    </a>
+                    
+                    <div class="pt-4 pb-2 px-4 text-xs font-semibold text-slate-400 uppercase">Tài khoản</div>
+                    <a href="{% url 'logout' %}" class="nav-link w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-red-400 hover:bg-red-900/50">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                        <span class="font-medium text-sm">Đăng Xuất</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10 flex-shrink-0">
+                <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    <button id="sidebar-toggle" class="lg:hidden p-2 text-gray-500 hover:text-gray-900 transition-colors">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    
+                    <div class="flex items-center ml-auto">
+                        <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-medium rounded-full border border-blue-100 hidden sm:inline-block">
+                            PostgreSQL Connected
+                        </span>
+                        <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                            <div class="text-right hidden md:block">
+                                <div class="text-sm font-semibold text-gray-800">{{ user.username }}</div>
+                                <div class="text-xs text-blue-600 font-medium uppercase">{{ user.vaitro }}</div>
+                            </div>
+                            <div class="w-9 h-9 rounded-full bg-slate-200 border border-white shadow-sm flex items-center justify-center text-slate-600 font-bold overflow-hidden">
+                                <i data-lucide="user"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-auto bg-gray-50 p-4 lg:p-6">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'js/main.js' %}" defer></script>
+    <script>
+        lucide.createIcons();
+
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const toggleButton = document.getElementById('sidebar-toggle');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        toggleButton.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', toggleSidebar);
+
+        // --- LOGIC ACTIVE LINK MỚI (FIX LỖI TRÙNG LẶP) ---
+        const currentPath = window.location.pathname; // Lấy đường dẫn tương đối (vd: /management/salary/payroll/)
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        navLinks.forEach(link => {
+            // So sánh đường dẫn của link với đường dẫn hiện tại
+            // new URL(link.href).pathname sẽ lấy phần path của link thẻ a
+            try {
+                const linkPath = new URL(link.href, window.location.origin).pathname;
+                
+                if (linkPath === currentPath) {
+                    // Xóa class cũ (nếu có)
+                    document.querySelector('.nav-link.active')?.classList.remove('active', 'bg-blue-600', 'text-white', 'shadow-md');
+                    
+                    // Thêm class active mới (Màu xanh đậm, chữ trắng)
+                    link.classList.add('active', 'bg-blue-600', 'text-white', 'shadow-md');
+                    link.classList.remove('text-slate-300', 'hover:bg-slate-700/70');
+                }
+            } catch (e) {
+                console.log("Invalid URL:", link.href);
+            }
+        });
+    </script>
+</body>
+</html>

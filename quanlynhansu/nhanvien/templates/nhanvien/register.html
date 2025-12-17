@@ -1,0 +1,202 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Ký - HRM System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center bg-slate-900 bg-opacity-95" style="background-image: url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'); background-blend-mode: overlay; background-size: cover;">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-500 to-teal-600"></div>
+            
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600">
+                    <i data-lucide="user-plus" class="w-6 h-6"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800 mt-3">Đăng Ký Tài Khoản</h1>
+                <p class="text-gray-500 mt-1">Tài khoản sẽ được admin phê duyệt trước khi sử dụng</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                <div class="p-3 mb-4 rounded-xl text-sm {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" action="{% url 'register' %}" class="space-y-5">
+                {% csrf_token %}
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Họ và Tên</label>
+                    <div class="relative">
+                        <i data-lucide="signature" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <input type="text" name="hoten" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all" placeholder="Nguyễn Văn A" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tên đăng nhập (Dùng để Login)</label>
+                    <div class="relative">
+                        <i data-lucide="user" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <input type="text" name="tendangnhap" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all" placeholder="Tên đăng nhập" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <input type="password" id="password" name="password" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all" placeholder="Nhập mật khẩu" required minlength="6">
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        <p>Mật khẩu phải có:</p>
+                        <ul class="list-disc list-inside space-y-1">
+                            <li id="length-check" class="text-red-500">Ít nhất 6 ký tự</li>
+                            <li id="letter-check" class="text-red-500">Ít nhất một chữ cái</li>
+                            <li id="number-check" class="text-red-500">Ít nhất một chữ số</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <input type="email" id="email" name="email" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all" placeholder="example@gmail.com" required pattern=".*@gmail\.com$">
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Email phải có đuôi @gmail.com</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                    <div class="relative">
+                        <i data-lucide="phone" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                        <input type="text" name="sdt" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all" placeholder="Số điện thoại" required>
+                    </div>
+                </div>
+    
+                <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold py-3 rounded-xl hover:shadow-lg hover:from-green-700 hover:to-teal-700 transition-all duration-300 shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Đăng Ký
+                </button>
+            </form>
+
+            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                    <span class="text-sm font-medium text-blue-800">Lưu ý quan trọng</span>
+                </div>
+                <ul class="text-xs text-blue-700 space-y-1">
+                    <li>• Tài khoản sẽ được admin phê duyệt trong vòng 24-48h</li>
+                    <li>• Bạn sẽ nhận được thông báo qua email khi tài khoản được kích hoạt</li>
+                    <li>• Liên hệ bộ phận nhân sự nếu cần hỗ trợ</li>
+                </ul>
+            </div>
+
+            <div class="mt-6 text-center text-sm text-gray-500">
+                Đã có tài khoản? 
+                <a href="{% url 'login' %}" class="text-blue-600 hover:text-blue-700 font-medium">Đăng Nhập</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Validation real-time cho mật khẩu
+        const passwordInput = document.getElementById('password');
+        const emailInput = document.getElementById('email');
+        const submitBtn = document.getElementById('submit-btn');
+        const lengthCheck = document.getElementById('length-check');
+        const letterCheck = document.getElementById('letter-check');
+        const numberCheck = document.getElementById('number-check');
+
+        function validatePassword() {
+            const password = passwordInput.value;
+            let isValid = true;
+
+            // Kiểm tra độ dài
+            if (password.length >= 6) {
+                lengthCheck.className = 'text-green-500';
+                lengthCheck.innerHTML = '✓ Ít nhất 6 ký tự';
+            } else {
+                lengthCheck.className = 'text-red-500';
+                lengthCheck.innerHTML = '✗ Ít nhất 6 ký tự';
+                isValid = false;
+            }
+
+            // Kiểm tra chữ cái
+            if (/[A-Za-z]/.test(password)) {
+                letterCheck.className = 'text-green-500';
+                letterCheck.innerHTML = '✓ Ít nhất một chữ cái';
+            } else {
+                letterCheck.className = 'text-red-500';
+                letterCheck.innerHTML = '✗ Ít nhất một chữ cái';
+                isValid = false;
+            }
+
+            // Kiểm tra chữ số
+            if (/\d/.test(password)) {
+                numberCheck.className = 'text-green-500';
+                numberCheck.innerHTML = '✓ Ít nhất một chữ số';
+            } else {
+                numberCheck.className = 'text-red-500';
+                numberCheck.innerHTML = '✗ Ít nhất một chữ số';
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        function validateEmail() {
+            const email = emailInput.value;
+            return email.endsWith('@gmail.com');
+        }
+
+        function updateSubmitButton() {
+            const passwordValid = validatePassword();
+            const emailValid = validateEmail();
+            
+            if (passwordValid && emailValid) {
+                submitBtn.disabled = false;
+                submitBtn.className = submitBtn.className.replace('disabled:opacity-50 disabled:cursor-not-allowed', '');
+            } else {
+                submitBtn.disabled = true;
+                if (!submitBtn.className.includes('disabled:opacity-50')) {
+                    submitBtn.className += ' disabled:opacity-50 disabled:cursor-not-allowed';
+                }
+            }
+        }
+
+        // Event listeners
+        passwordInput.addEventListener('input', updateSubmitButton);
+        emailInput.addEventListener('input', function() {
+            const email = this.value;
+            if (email && !email.endsWith('@gmail.com')) {
+                this.setCustomValidity('Email phải có đuôi @gmail.com');
+                this.style.borderColor = '#ef4444';
+            } else {
+                this.setCustomValidity('');
+                this.style.borderColor = '#d1d5db';
+            }
+            updateSubmitButton();
+        });
+
+        // Validation khi submit
+        document.querySelector('form').addEventListener('submit', function(e) {
+            if (!validatePassword() || !validateEmail()) {
+                e.preventDefault();
+                alert('Vui lòng kiểm tra lại thông tin đăng ký!');
+            }
+        });
+
+        // Khởi tạo trạng thái ban đầu
+        updateSubmitButton();
+    </script>
+</body>
+</html>

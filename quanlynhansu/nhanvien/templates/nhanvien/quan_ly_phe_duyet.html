@@ -1,0 +1,234 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white p-6 rounded-xl shadow-lg border border-blue-100">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="user-check" class="text-blue-600"></i>
+            Quản Lý Phê Duyệt Tài Khoản
+        </h2>
+        <p class="text-gray-500 mt-2">Phê duyệt tài khoản mới đăng ký từ người dùng</p>
+    </div>
+
+    <!-- Thống kê tổng quan -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Chờ duyệt</p>
+                    <h3 class="text-2xl font-bold text-orange-600">{{ tong_cho_duyet }}</h3>
+                </div>
+                <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                    <i data-lucide="clock" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Đã duyệt</p>
+                    <h3 class="text-2xl font-bold text-green-600">{{ tong_da_duyet }}</h3>
+                </div>
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Từ chối</p>
+                    <h3 class="text-2xl font-bold text-red-600">{{ tong_tu_choi }}</h3>
+                </div>
+                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                    <i data-lucide="x-circle" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách tài khoản chờ duyệt -->
+    {% if tai_khoan_cho_duyet %}
+    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-orange-50">
+            <h3 class="font-bold text-orange-800 flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                Tài khoản chờ phê duyệt ({{ tong_cho_duyet }})
+            </h3>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-sm">
+                    <tr>
+                        <th class="p-4">Tên đăng nhập</th>
+                        <th class="p-4">Thông tin nhân viên</th>
+                        <th class="p-4">Email</th>
+                        <th class="p-4">Ngày đăng ký</th>
+                        <th class="p-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-sm">
+                    {% for tk in tai_khoan_cho_duyet %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4">
+                            <div>
+                                <p class="font-medium text-gray-800">{{ tk.tendangnhap }}</p>
+                                <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                                    {{ tk.trang_thai_duyet }}
+                                </span>
+                            </div>
+                        </td>
+                        
+                        <td class="p-4">
+                            {% if tk.manhanvien %}
+                            <div>
+                                <p class="font-medium text-gray-800">{{ tk.manhanvien.hoten }}</p>
+                                <p class="text-xs text-gray-500">{{ tk.manhanvien.manhanvien }}</p>
+                                <p class="text-xs text-gray-500">{{ tk.manhanvien.sdt|default:"--" }}</p>
+                            </div>
+                            {% else %}
+                            <span class="text-gray-400">Chưa có thông tin</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td class="p-4">
+                            {% if tk.manhanvien %}
+                                {{ tk.manhanvien.email }}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </td>
+                        
+                        <td class="p-4 text-gray-600">
+                            {{ tk.ngay_tao|date:"d/m/Y H:i" }}
+                        </td>
+                        
+                        <td class="p-4">
+                            <div class="flex gap-2">
+                                <!-- Nút phê duyệt -->
+                                <a href="{% url 'phe_duyet_tai_khoan' tk.tendangnhap 'duyet' %}" 
+                                   onclick="return confirm('Bạn có chắc chắn muốn phê duyệt tài khoản {{ tk.tendangnhap }}?')"
+                                   class="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 flex items-center gap-1">
+                                    <i data-lucide="check" class="w-3 h-3"></i> Duyệt
+                                </a>
+                                
+                                <!-- Nút từ chối -->
+                                <button onclick="showRejectModal('{{ tk.tendangnhap }}')" 
+                                        class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 flex items-center gap-1">
+                                    <i data-lucide="x" class="w-3 h-3"></i> Từ chối
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
+        <i data-lucide="check-circle" class="w-16 h-16 text-green-400 mx-auto mb-4"></i>
+        <h3 class="font-medium text-green-800 mb-2">Không có tài khoản nào chờ duyệt</h3>
+        <p class="text-green-600 text-sm">Tất cả tài khoản đã được xử lý.</p>
+    </div>
+    {% endif %}
+
+    <!-- Lịch sử phê duyệt -->
+    {% if tai_khoan_da_xu_ly %}
+    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <h3 class="font-bold text-gray-700">Lịch sử phê duyệt (20 gần nhất)</h3>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-sm">
+                    <tr>
+                        <th class="p-4">Tên đăng nhập</th>
+                        <th class="p-4">Nhân viên</th>
+                        <th class="p-4">Trạng thái</th>
+                        <th class="p-4">Người duyệt</th>
+                        <th class="p-4">Ngày duyệt</th>
+                        <th class="p-4">Lý do từ chối</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-sm">
+                    {% for tk in tai_khoan_da_xu_ly %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-medium">{{ tk.tendangnhap }}</td>
+                        <td class="p-4">
+                            {% if tk.manhanvien %}
+                                {{ tk.manhanvien.hoten }}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium
+                                {% if tk.trang_thai_duyet == 'Đã duyệt' %}bg-green-100 text-green-700
+                                {% else %}bg-red-100 text-red-700{% endif %}">
+                                {{ tk.trang_thai_duyet }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-gray-600">{{ tk.nguoi_duyet|default:"--" }}</td>
+                        <td class="p-4 text-gray-600">{{ tk.ngay_duyet|date:"d/m/Y H:i"|default:"--" }}</td>
+                        <td class="p-4 text-gray-600">{{ tk.ly_do_tu_choi|default:"--" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal từ chối -->
+<div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Từ chối tài khoản</h3>
+        
+        <form id="rejectForm" method="POST">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Lý do từ chối:</label>
+                <textarea name="ly_do_tu_choi" rows="3" 
+                          class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          placeholder="Nhập lý do từ chối tài khoản..." required></textarea>
+            </div>
+            
+            <div class="flex gap-3 justify-end">
+                <button type="button" onclick="hideRejectModal()" 
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400">
+                    Hủy
+                </button>
+                <button type="submit" 
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                    Từ chối
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function showRejectModal(tendangnhap) {
+    document.getElementById('rejectModal').classList.remove('hidden');
+    document.getElementById('rejectForm').action = `/management/accounts/approval/${tendangnhap}/tu_choi/`;
+}
+
+function hideRejectModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+}
+
+// Đóng modal khi click outside
+document.getElementById('rejectModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideRejectModal();
+    }
+});
+</script>
+{% endblock %}

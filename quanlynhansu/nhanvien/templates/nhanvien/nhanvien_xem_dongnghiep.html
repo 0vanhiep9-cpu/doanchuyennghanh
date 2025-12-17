@@ -1,0 +1,98 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white p-6 rounded-xl shadow-lg border border-blue-100">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="users" class="text-blue-600"></i>
+            Danh Sách Đồng Nghiệp
+        </h2>
+        <p class="text-gray-500 mt-2">Thông tin nhân viên trong công ty</p>
+    </div>
+
+    {% if nv_hien_tai %}
+    <!-- Đồng nghiệp cùng phòng ban -->
+    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-blue-50">
+            <h3 class="font-bold text-blue-800 flex items-center gap-2">
+                <i data-lucide="users" class="w-5 h-5"></i>
+                Đồng nghiệp cùng phòng ban: {{ nv_hien_tai.maphongban.tenphongban }}
+            </h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-sm">
+                    <tr>
+                        <th class="p-4">Mã NV</th>
+                        <th class="p-4">Họ Tên</th>
+                        <th class="p-4">Chức Vụ</th>
+                        <th class="p-4">Email</th>
+                        <th class="p-4">SĐT</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-sm">
+                    {% for nv in dong_nghiep %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-medium text-blue-600">{{ nv.manhanvien }}</td>
+                        <td class="p-4 font-medium text-gray-800">{{ nv.hoten }}</td>
+                        <td class="p-4 text-gray-600">{{ nv.machucvu.tenchucvu|default:"--" }}</td>
+                        <td class="p-4 text-gray-600">{{ nv.email }}</td>
+                        <td class="p-4 text-gray-600">{{ nv.sdt|default:"--" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="p-6 text-center text-gray-500 italic">
+                            Bạn là nhân viên duy nhất trong phòng ban này.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Nhân viên các phòng ban khác -->
+    {% if nv_khac_phong %}
+    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <h3 class="font-bold text-gray-700 flex items-center gap-2">
+                <i data-lucide="building-2" class="w-5 h-5"></i>
+                Nhân viên các phòng ban khác
+            </h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-sm">
+                    <tr>
+                        <th class="p-4">Mã NV</th>
+                        <th class="p-4">Họ Tên</th>
+                        <th class="p-4">Phòng Ban</th>
+                        <th class="p-4">Chức Vụ</th>
+                        <th class="p-4">Email</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-sm">
+                    {% for nv in nv_khac_phong %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-medium text-gray-600">{{ nv.manhanvien }}</td>
+                        <td class="p-4 font-medium text-gray-800">{{ nv.hoten }}</td>
+                        <td class="p-4 text-gray-600">{{ nv.maphongban.tenphongban|default:"--" }}</td>
+                        <td class="p-4 text-gray-600">{{ nv.machucvu.tenchucvu|default:"--" }}</td>
+                        <td class="p-4 text-gray-600">{{ nv.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+        <i data-lucide="alert-triangle" class="w-12 h-12 text-yellow-600 mx-auto mb-4"></i>
+        <p class="text-yellow-800 font-medium">Không tìm thấy thông tin nhân viên của bạn.</p>
+        <p class="text-yellow-600 text-sm mt-2">Vui lòng liên hệ bộ phận nhân sự để cập nhật hồ sơ.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

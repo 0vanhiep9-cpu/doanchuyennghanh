@@ -1,0 +1,95 @@
+/* 
+    FILE: nhanvien/static/css/style.css 
+*/
+
+/* Import Font Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f9fafb; /* gray-50 */
+    color: #1f2937; /* gray-800 */
+}
+
+/* --- Custom Scrollbar (Giống React) --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* slate-300 */
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* slate-400 */
+}
+
+/* --- Utility Classes --- */
+.chart-container {
+    position: relative;
+    height: 320px;
+    width: 100%;
+}
+
+.card-hover {
+    transition: all 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* --- Currency Formatting --- */
+.currency {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+.currency-positive {
+    color: #059669; /* green-600 */
+}
+
+.currency-negative {
+    color: #dc2626; /* red-600 */
+}
+
+.currency-large {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.currency-small {
+    font-size: 0.875rem;
+}
+
+/* --- Mobile Sidebar Overlay --- */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    display: none;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* --- Active Menu State --- */
+.nav-link.active {
+    background-color: #2563eb; /* blue-600 */
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.nav-link:not(.active):hover {
+    background-color: #334155; /* slate-700 */
+    color: white;
+}

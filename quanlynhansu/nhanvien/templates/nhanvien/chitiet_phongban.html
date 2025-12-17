@@ -1,0 +1,81 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <div>
+                <h2 class="text-2xl font-bold text-gray-800 uppercase">{{ phongban.tenphongban }}</h2>
+                <p class="text-sm text-gray-500 mt-1">Mã phòng ban: {{ phongban.maphongban }}</p>
+            </div>
+            <div class="text-right">
+                <span class="text-4xl font-extrabold text-blue-600">{{ nhanviens_phong|length }}</span>
+                <p class="text-sm text-gray-500">Tổng nhân sự</p>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <p class="text-sm text-gray-600"><i data-lucide="map-pin" class="w-4 h-4 inline mr-1 text-gray-500"></i> Địa chỉ: {{ phongban.diachi|default:"Chưa cập nhật" }}</p>
+            <p class="text-sm text-gray-600"><i data-lucide="phone" class="w-4 h-4 inline mr-1 text-gray-500"></i> SĐT: {{ phongban.sdt|default:"---" }}</p>
+            <a href="{% url 'chinh_sua_phong_ban' phongban.maphongban %}" class="text-sm text-blue-600 hover:underline"><i data-lucide="edit" class="w-4 h-4 inline mr-1"></i> Chỉnh sửa thông tin phòng</a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-300 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-bold text-gray-800">DANH SÁCH NHÂN VIÊN</h3>
+            <a href="{% url 'them_moi_nhan_vien' %}" class="flex items-center gap-2 bg-[#2563eb] text-white px-4 py-1.5 rounded shadow-sm text-sm font-medium hover:bg-blue-700 transition">
+                <i data-lucide="user-plus" class="w-4 h-4"></i>
+                <span>Thêm nhân viên</span>
+            </a>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-100 text-gray-700">
+                    <tr>
+                        <th class="px-3 py-2 text-xs font-bold uppercase w-16">MS</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase min-w-[150px]">Họ Tên</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase min-w-[120px]">Chức Vụ</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase w-28 text-center">Ngày Vào</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase w-28 text-center">Trạng Thái</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase w-24 text-center">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for nv in nhanviens_phong %}
+                    <tr class="hover:bg-blue-50 transition text-sm">
+                        <td class="px-3 py-2 font-medium text-gray-900">{{ nv.manhanvien }}</td>
+                        <td class="px-3 py-2 text-gray-800">{{ nv.hoten }}</td>
+                        <td class="px-3 py-2 text-gray-600">{{ nv.machucvu.tenchucvu }}</td>
+                        <td class="px-3 py-2 text-gray-600 text-center">{{ nv.ngaynhap|date:"d/m/Y" }}</td>
+                        <td class="px-3 py-2 text-center">
+                            {% if nv.trangthai == 'Đang làm' %}
+                                <span class="text-xs text-green-600 font-semibold">● Đang làm</span>
+                            {% else %}
+                                <span class="text-xs text-red-600 font-semibold">● {{ nv.trangthai }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-3 py-2 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <a href="{% url 'chi_tiet_nhan_vien' nv.manhanvien %}" class="p-1 text-blue-600 hover:bg-blue-100 rounded transition" title="Xem chi tiết">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </a>
+                                <a href="{% url 'chinh_sua_nhan_vien' nv.manhanvien %}" class="p-1 text-gray-600 hover:bg-gray-200 rounded transition" title="Chỉnh sửa">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </a>
+                                </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-gray-500">Phòng ban này chưa có nhân viên nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

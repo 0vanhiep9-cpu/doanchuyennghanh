@@ -1,0 +1,224 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800">
+        {% if is_adding %}
+            Thêm Mới Hồ Sơ Nhân Viên
+        {% else %}
+            Chỉnh Sửa Hồ Sơ: {{ nhanvien.hoten }} ({{ nhanvien.manhanvien }})
+        {% endif %}
+    </h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="p-3 rounded-lg text-sm {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data"
+          action="{% if is_adding %}{% url 'them_moi_nhan_vien' %}{% else %}{% url 'chinh_sua_nhan_vien' nhanvien.manhanvien %}{% endif %}"
+          class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 space-y-6">
+        {% csrf_token %}
+        
+        <div class="space-y-4 border-b pb-4">
+            <h3 class="text-lg font-semibold text-blue-600 border-b pb-2">Thông Tin Cơ Bản</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Họ và Tên</label>
+                    <input type="text" name="hoten" value="{{ nhanvien.hoten|default:'' }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Ngày Sinh</label>
+                    <input type="date" name="ngaysinh" value="{{ nhanvien.ngaysinh|date:'Y-m-d'|default:'' }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Giới Tính</label>
+                    <select name="gioitinh" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        <option value="Nam" {% if nhanvien.gioitinh == 'Nam' %}selected{% endif %}>Nam</option>
+                        <option value="Nữ" {% if nhanvien.gioitinh == 'Nữ' %}selected{% endif %}>Nữ</option>
+                        <option value="Khác" {% if nhanvien.gioitinh == 'Khác' %}selected{% endif %}>Khác</option>
+                    </select>
+                </div>
+
+                 <div>
+                    <label class="block text-sm font-medium text-gray-700">Số Điện Thoại</label>
+                    <input type="text" name="sdt" value="{{ nhanvien.sdt|default:'' }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                </div>
+                
+                 <div>
+                    <label class="block text-sm font-medium text-gray-700">CCCD/CMND</label>
+                    <input type="text" name="cccd" value="{{ nhanvien.cccd|default:'' }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="email" value="{{ nhanvien.email|default:'' }}" 
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" 
+                           required pattern=".*@gmail\.com$" 
+                           title="Email phải có đuôi @gmail.com">
+                    <p class="mt-1 text-xs text-gray-500">Email phải có đuôi @gmail.com</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4 border-b pb-4">
+            <h3 class="text-lg font-semibold text-green-600 border-b pb-2">Thông Tin Công Việc</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Phòng Ban</label>
+                    <select name="maphongban" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                        {% for pb in phongbans %}
+                            <option value="{{ pb.maphongban }}" {% if nhanvien.maphongban.maphongban == pb.maphongban %}selected{% endif %}>
+                                {{ pb.tenphongban }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Chức Vụ</label>
+                    <select name="machucvu" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                        {% for cv in chucvus %}
+                            <option value="{{ cv.machucvu }}" {% if nhanvien.machucvu.machucvu == cv.machucvu %}selected{% endif %}>
+                                {{ cv.tenchucvu }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Ngày Gia Nhập</label>
+                    <input type="date" name="ngaynhap" value="{{ nhanvien.ngaynhap|date:'Y-m-d'|default:'' }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Trạng Thái</label>
+                    <select name="trangthai" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        <option value="Đang làm" {% if nhanvien.trangthai == 'Đang làm' %}selected{% endif %}>Đang làm</option>
+                        <option value="Đã nghỉ việc" {% if nhanvien.trangthai == 'Đã nghỉ việc' %}selected{% endif %}>Đã nghỉ việc</option>
+                        <option value="Nghỉ thai sản" {% if nhanvien.trangthai == 'Nghỉ thai sản' %}selected{% endif %}>Nghỉ thai sản</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Ngày Nghỉ Việc (Nếu có)</label>
+                    <input type="date" name="ngaynghi" value="{{ nhanvien.ngaynghi|date:'Y-m-d'|default:'' }}" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4 border-b pb-4">
+            <h3 class="text-lg font-semibold text-purple-600 border-b pb-2">Thông Tin Ngân Hàng</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tên Ngân Hàng</label>
+                    <select name="ten_ngan_hang" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+                        <option value="">-- Chọn ngân hàng --</option>
+                        <option value="Vietcombank" {% if nhanvien.ten_ngan_hang == 'Vietcombank' %}selected{% endif %}>Vietcombank</option>
+                        <option value="VietinBank" {% if nhanvien.ten_ngan_hang == 'VietinBank' %}selected{% endif %}>VietinBank</option>
+                        <option value="BIDV" {% if nhanvien.ten_ngan_hang == 'BIDV' %}selected{% endif %}>BIDV</option>
+                        <option value="Agribank" {% if nhanvien.ten_ngan_hang == 'Agribank' %}selected{% endif %}>Agribank</option>
+                        <option value="Techcombank" {% if nhanvien.ten_ngan_hang == 'Techcombank' %}selected{% endif %}>Techcombank</option>
+                        <option value="ACB" {% if nhanvien.ten_ngan_hang == 'ACB' %}selected{% endif %}>ACB</option>
+                        <option value="MB Bank" {% if nhanvien.ten_ngan_hang == 'MB Bank' %}selected{% endif %}>MB Bank</option>
+                        <option value="TPBank" {% if nhanvien.ten_ngan_hang == 'TPBank' %}selected{% endif %}>TPBank</option>
+                        <option value="Sacombank" {% if nhanvien.ten_ngan_hang == 'Sacombank' %}selected{% endif %}>Sacombank</option>
+                        <option value="VPBank" {% if nhanvien.ten_ngan_hang == 'VPBank' %}selected{% endif %}>VPBank</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Số Tài Khoản</label>
+                    <input type="text" name="so_tai_khoan" value="{{ nhanvien.so_tai_khoan|default:'' }}" 
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                           placeholder="Nhập số tài khoản">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Chủ Tài Khoản</label>
+                    <input type="text" name="chu_tai_khoan" value="{{ nhanvien.chu_tai_khoan|default:'' }}" 
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                           placeholder="Tên chủ tài khoản">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Chi Nhánh</label>
+                    <input type="text" name="chi_nhanh" value="{{ nhanvien.chi_nhanh|default:'' }}" 
+                           class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                           placeholder="Chi nhánh ngân hàng">
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                    <span class="text-sm font-medium text-blue-800">Lưu ý về thông tin ngân hàng</span>
+                </div>
+                <ul class="text-sm text-blue-700 space-y-1">
+                    <li>• Thông tin ngân hàng được sử dụng để chuyển khoản lương</li>
+                    <li>• Vui lòng kiểm tra kỹ số tài khoản và tên chủ tài khoản</li>
+                    <li>• Tên chủ tài khoản phải trùng với họ tên nhân viên</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="space-y-4 border-b pb-4">
+            <h3 class="text-lg font-semibold text-indigo-600 border-b pb-2">Ảnh Đại Diện</h3>
+            
+            <div class="flex items-start gap-6">
+                <div class="flex-shrink-0">
+                    {% if nhanvien.thongtinanh %}
+                        <img src="/media/avatars/{{ nhanvien.thongtinanh }}" alt="Avatar hiện tại" class="w-32 h-32 object-cover rounded-lg border border-gray-300">
+                    {% else %}
+                        <div class="w-32 h-32 bg-gray-200 rounded-lg border border-gray-300 flex items-center justify-center">
+                            <i data-lucide="user" class="w-12 h-12 text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Chọn ảnh mới</label>
+                    <input type="file" name="thongtinanh" accept="image/*" 
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                    <p class="mt-2 text-xs text-gray-500">
+                        Chấp nhận: JPG, PNG, GIF. Kích thước tối đa: 5MB
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-lg font-semibold text-orange-600 border-b pb-2">Thông Tin Hợp Đồng</h3>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Mã Hợp Đồng</label>
+                <select name="mahopdong" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3" required>
+                    {% for hd in hopdongs %}
+                        <option value="{{ hd.mahopdong }}" {% if nhanvien.mahopdong.mahopdong == hd.mahopdong %}selected{% endif %}>
+                            {{ hd.mahopdong }} - {{ hd.loaihopdong }} ({{ hd.ngaybatdau|date:'d/m/Y' }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="pt-4 flex justify-end gap-3">
+            <a href="{% if is_adding %}{% url 'danh_sach_nhan_vien' %}{% else %}{% url 'chi_tiet_nhan_vien' nhanvien.manhanvien %}{% endif %}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition">Hủy</a>
+            
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+                <i data-lucide="save" class="w-5 h-5 inline mr-1"></i> 
+                {% if is_adding %}Thêm Hồ Sơ{% else %}Lưu Thay Đổi{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

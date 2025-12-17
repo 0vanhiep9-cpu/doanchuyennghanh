@@ -1,0 +1,223 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                <a href="{% url 'danh_sach_hop_dong' %}" class="text-gray-500 hover:text-gray-700">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </a>
+                <h2 class="text-2xl font-bold text-gray-800">Chi Tiết Hợp Đồng</h2>
+            </div>
+            <p class="text-gray-600">Thông tin chi tiết hợp đồng {{ hop_dong.mahopdong }}</p>
+        </div>
+        {% if vaitro == 'Admin' %}
+        <div class="flex gap-2">
+            <a href="{% url 'chinh_sua_hop_dong' hop_dong.mahopdong %}" 
+               class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                <i data-lucide="edit" class="w-4 h-4"></i>
+                Chỉnh Sửa
+            </a>
+            {% if is_expired and hop_dong.ngayketthuc %}
+            <a href="{% url 'gia_han_hop_dong' hop_dong.mahopdong %}" 
+               class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                Gia Hạn
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Thông tin hợp đồng -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Thông tin cơ bản -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
+                Thông Tin Hợp Đồng
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Mã Hợp Đồng</label>
+                    <div class="text-lg font-semibold text-gray-800">{{ hop_dong.mahopdong }}</div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Loại Hợp Đồng</label>
+                    <span class="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700">
+                        {{ hop_dong.loaihopdong|title }}
+                    </span>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ngày Bắt Đầu</label>
+                    <div class="text-gray-800">{{ hop_dong.ngaybatdau|date:"d/m/Y" }}</div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ngày Kết Thúc</label>
+                    {% if hop_dong.ngayketthuc %}
+                    <div class="text-gray-800">{{ hop_dong.ngayketthuc|date:"d/m/Y" }}</div>
+                    {% if is_expired %}
+                    <span class="text-xs text-red-600 font-medium">
+                        <i data-lucide="alert-circle" class="w-3 h-3 inline mr-1"></i>
+                        Đã hết hạn
+                    </span>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-green-600 font-medium">Không thời hạn</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if hop_dong.ghichu %}
+            <div class="mt-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ghi Chú</label>
+                <div class="bg-gray-50 p-3 rounded-lg text-gray-700 whitespace-pre-line">{{ hop_dong.ghichu }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Thống kê -->
+        <div class="space-y-4">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i data-lucide="users" class="w-5 h-5 text-green-600"></i>
+                    Thống Kê Nhân Viên
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Tổng nhân viên:</span>
+                        <span class="font-semibold text-gray-800">{{ tong_nhan_vien }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Đang làm việc:</span>
+                        <span class="font-semibold text-green-600">{{ nv_dang_lam }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Đã nghỉ việc:</span>
+                        <span class="font-semibold text-red-600">{{ nv_da_nghi }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trạng thái hợp đồng -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600"></i>
+                    Trạng Thái
+                </h3>
+                
+                {% if is_expired %}
+                <div class="flex items-center gap-2 text-red-600">
+                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                    <span class="font-medium">Hợp đồng đã hết hạn</span>
+                </div>
+                {% else %}
+                <div class="flex items-center gap-2 text-green-600">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    <span class="font-medium">Hợp đồng còn hiệu lực</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách nhân viên sử dụng hợp đồng -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-bold text-gray-800">Nhân Viên Sử Dụng Hợp Đồng Này</h3>
+            <span class="text-sm text-gray-500">{{ tong_nhan_vien }} nhân viên</span>
+        </div>
+
+        {% if nhan_vien_list %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-gray-600 text-xs uppercase">
+                    <tr>
+                        <th class="px-6 py-3">Mã NV</th>
+                        <th class="px-6 py-3">Họ Tên</th>
+                        <th class="px-6 py-3">Phòng Ban</th>
+                        <th class="px-6 py-3">Chức Vụ</th>
+                        <th class="px-6 py-3">Ngày Vào</th>
+                        <th class="px-6 py-3">Trạng Thái</th>
+                        <th class="px-6 py-3">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for nv in nhan_vien_list %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 font-medium text-gray-800">{{ nv.manhanvien }}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                {% if nv.thongtinanh %}
+                                <img src="/media/avatars/{{ nv.thongtinanh }}" 
+                                     alt="{{ nv.hoten }}" 
+                                     class="w-8 h-8 rounded-full object-cover"
+                                     onerror="console.log('Lỗi load ảnh: /media/avatars/{{ nv.thongtinanh }}'); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center" style="display:none;">
+                                    <i data-lucide="user" class="w-4 h-4 text-gray-500"></i>
+                                </div>
+                                {% else %}
+                                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <i data-lucide="user" class="w-4 h-4 text-gray-500"></i>
+                                </div>
+                                {% endif %}
+                                <span class="font-medium text-gray-800">{{ nv.hoten }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">
+                            {{ nv.maphongban.tenphongban|default:"Chưa phân công" }}
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">
+                            {{ nv.machucvu.tenchucvu|default:"Chưa có" }}
+                        </td>
+                        <td class="px-6 py-4 text-gray-600">
+                            {{ nv.ngaynhap|date:"d/m/Y"|default:"Chưa rõ" }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if nv.trangthai == 'Đang làm' %}
+                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                                {{ nv.trangthai }}
+                            </span>
+                            {% else %}
+                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
+                                {{ nv.trangthai }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{% url 'chi_tiet_nhan_vien' nv.manhanvien %}" 
+                               class="text-blue-600 hover:text-blue-800 p-1 rounded" title="Xem hồ sơ">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="px-6 py-12 text-center">
+            <i data-lucide="users" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+            <p class="text-gray-500">Chưa có nhân viên nào sử dụng hợp đồng này</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Khởi tạo icons
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

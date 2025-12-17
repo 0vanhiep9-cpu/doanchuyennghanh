@@ -1,0 +1,176 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white p-6 rounded-xl shadow-lg border border-blue-100">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="history" class="text-blue-600"></i>
+            Lịch Sử Chuyển Khoản Lương
+        </h2>
+        <p class="text-gray-500 mt-2">
+            {% if vaitro == 'Admin' %}Theo dõi tất cả giao dịch chuyển khoản lương
+            {% else %}Lịch sử chuyển khoản lương của bạn{% endif %}
+        </p>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="bg-white p-4 rounded-xl shadow border border-gray-200">
+        <form method="GET" class="flex items-center gap-4">
+            <div>
+                <label class="text-sm font-medium text-gray-700">Trạng thái:</label>
+                <select name="trang_thai" class="ml-2 border rounded-lg px-3 py-2">
+                    <option value="">Tất cả</option>
+                    <option value="Chờ xử lý" {% if trang_thai_filter == 'Chờ xử lý' %}selected{% endif %}>Chờ xử lý</option>
+                    <option value="Đang xử lý" {% if trang_thai_filter == 'Đang xử lý' %}selected{% endif %}>Đang xử lý</option>
+                    <option value="Thành công" {% if trang_thai_filter == 'Thành công' %}selected{% endif %}>Thành công</option>
+                    <option value="Thất bại" {% if trang_thai_filter == 'Thất bại' %}selected{% endif %}>Thất bại</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Lọc
+            </button>
+        </form>
+    </div>
+
+    <!-- Bảng lịch sử -->
+    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+            <h3 class="font-bold text-gray-700">Danh sách giao dịch</h3>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-sm">
+                    <tr>
+                        <th class="p-4">Mã GD</th>
+                        {% if vaitro == 'Admin' %}
+                        <th class="p-4">Nhân Viên</th>
+                        {% endif %}
+                        <th class="p-4">Tháng Lương</th>
+                        <th class="p-4">Số Tiền</th>
+                        <th class="p-4">Ngân Hàng</th>
+                        <th class="p-4">Thời Gian</th>
+                        <th class="p-4">Trạng Thái</th>
+                        <th class="p-4">Chi Tiết</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-sm">
+                    {% for ls in lich_su_list %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4 font-mono text-blue-600">
+                            {{ ls.ma_giao_dich }}
+                        </td>
+                        
+                        {% if vaitro == 'Admin' %}
+                        <td class="p-4">
+                            <div>
+                                <p class="font-medium text-gray-800">{{ ls.bang_luong.manhanvien.hoten }}</p>
+                                <p class="text-xs text-gray-500">{{ ls.bang_luong.manhanvien.manhanvien }}</p>
+                            </div>
+                        </td>
+                        {% endif %}
+                        
+                        <td class="p-4 text-gray-600">
+                            {{ ls.bang_luong.thang_luong|date:"m/Y" }}
+                        </td>
+                        
+                        <td class="p-4">
+                            <div>
+                                <p class="font-medium text-green-600">{{ ls.so_tien_chuyen|floatformat:0|intcomma }} VNĐ</p>
+                                {% if ls.phi_chuyen_khoan > 0 %}
+                                <p class="text-xs text-red-500">Phí: -{{ ls.phi_chuyen_khoan|floatformat:0|intcomma }} VNĐ</p>
+                                <p class="text-xs text-gray-600">Thực nhận: {{ ls.so_tien_thuc_nhan|floatformat:0|intcomma }} VNĐ</p>
+                                {% endif %}
+                            </div>
+                        </td>
+                        
+                        <td class="p-4">
+                            <div class="text-xs">
+                                <p class="font-medium">{{ ls.ngan_hang_nhan }}</p>
+                                <p class="text-gray-500">{{ ls.so_tk_nhan }}</p>
+                                <p class="text-gray-500">{{ ls.ten_tk_nhan }}</p>
+                            </div>
+                        </td>
+                        
+                        <td class="p-4">
+                            <div class="text-xs">
+                                <p class="text-gray-600">Tạo: {{ ls.ngay_tao_lenh|date:"d/m/Y H:i" }}</p>
+                                {% if ls.ngay_thuc_hien %}
+                                <p class="text-green-600">Hoàn thành: {{ ls.ngay_thuc_hien|date:"d/m/Y H:i" }}</p>
+                                {% endif %}
+                            </div>
+                        </td>
+                        
+                        <td class="p-4">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium
+                                {% if ls.trang_thai == 'Chờ xử lý' %}bg-gray-100 text-gray-700
+                                {% elif ls.trang_thai == 'Đang xử lý' %}bg-yellow-100 text-yellow-700
+                                {% elif ls.trang_thai == 'Thành công' %}bg-green-100 text-green-700
+                                {% elif ls.trang_thai == 'Thất bại' %}bg-red-100 text-red-700
+                                {% else %}bg-gray-100 text-gray-700{% endif %}">
+                                {{ ls.trang_thai }}
+                            </span>
+                        </td>
+                        
+                        <td class="p-4">
+                            <button onclick="showDetail('{{ ls.ma_giao_dich }}')" 
+                                    class="text-blue-600 hover:text-blue-800 text-xs">
+                                <i data-lucide="eye" class="w-4 h-4 inline"></i> Xem
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Chi tiết ẩn -->
+                    <tr id="detail-{{ ls.ma_giao_dich }}" class="hidden bg-blue-50">
+                        <td colspan="{% if vaitro == 'Admin' %}8{% else %}7{% endif %}" class="p-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <h4 class="font-medium text-gray-800 mb-2">Thông tin giao dịch</h4>
+                                    {% if ls.ma_tham_chieu_ngan_hang %}
+                                    <p><span class="text-gray-600">Mã tham chiếu NH:</span> {{ ls.ma_tham_chieu_ngan_hang }}</p>
+                                    {% endif %}
+                                    {% if ls.nguoi_thuc_hien %}
+                                    <p><span class="text-gray-600">Người thực hiện:</span> {{ ls.nguoi_thuc_hien }}</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if ls.ly_do_that_bai %}
+                                    <h4 class="font-medium text-red-600 mb-2">Lý do thất bại</h4>
+                                    <p class="text-red-600">{{ ls.ly_do_that_bai }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if vaitro == 'Admin' %}8{% else %}7{% endif %}" class="p-8 text-center text-gray-500">
+                            <i data-lucide="inbox" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+                            <p class="font-medium mb-1">Chưa có lịch sử chuyển khoản</p>
+                            <p class="text-sm">Các giao dịch chuyển khoản sẽ hiển thị tại đây.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function showDetail(maGD) {
+    const detailRow = document.getElementById('detail-' + maGD);
+    if (detailRow.classList.contains('hidden')) {
+        // Ẩn tất cả detail khác
+        document.querySelectorAll('[id^="detail-"]').forEach(row => {
+            row.classList.add('hidden');
+        });
+        // Hiện detail này
+        detailRow.classList.remove('hidden');
+    } else {
+        detailRow.classList.add('hidden');
+    }
+}
+</script>
+{% endblock %}

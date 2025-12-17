@@ -1,0 +1,214 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+{% load currency_filters %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-white p-6 rounded-xl shadow-lg border border-blue-100">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <i data-lucide="credit-card" class="text-blue-600"></i>
+            Quản Lý Chuyển Khoản Lương
+        </h2>
+        <p class="text-gray-500 mt-2">Quản lý việc trả lương qua ngân hàng</p>
+    </div>
+
+    <!-- Thống kê tổng quan -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Tổng nhân viên</p>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ tong_nhan_vien }}</h3>
+                </div>
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Tổng tiền lương</p>
+                    <h3 class="text-xl font-bold text-green-600">{{ tong_tien_luong|floatformat:0|intcomma }} VNĐ</h3>
+                </div>
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Chuyển khoản</p>
+                    <h3 class="text-2xl font-bold text-blue-600">{{ chuyen_khoan_count }}</h3>
+                    <p class="text-xs text-gray-400">Tiền mặt: {{ tien_mat_count }}</p>
+                </div>
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i data-lucide="credit-card" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Chưa chuyển</p>
+                    <h3 class="text-2xl font-bold text-orange-600">{{ chua_chuyen }}</h3>
+                    <p class="text-xs text-gray-400">Thành công: {{ thanh_cong }}</p>
+                </div>
+                <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                    <i data-lucide="clock" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="bg-white p-4 rounded-xl shadow border border-gray-200">
+        <form method="GET" class="flex items-center gap-4">
+            <div>
+                <label class="text-sm font-medium text-gray-700">Tháng lương:</label>
+                <input type="month" name="thang" value="{{ thang_loc|date:'Y-m' }}" 
+                       class="ml-2 border rounded-lg px-3 py-2">
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                Lọc
+            </button>
+        </form>
+    </div>
+
+    <!-- Bảng danh sách -->
+    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+            <h3 class="font-bold text-gray-700">Danh sách lương tháng {{ thang_loc|date:"m/Y" }}</h3>
+            
+            <form method="POST" action="{% url 'thuc_hien_chuyen_khoan_luong' %}" id="transfer-form">
+                {% csrf_token %}
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    Chuyển khoản đã chọn
+                </button>
+            </form>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-gray-600 text-sm">
+                    <tr>
+                        <th class="p-4">
+                            <input type="checkbox" id="select-all" class="rounded">
+                        </th>
+                        <th class="p-4">Nhân Viên</th>
+                        <th class="p-4">Thực Lĩnh</th>
+                        <th class="p-4">Phương Thức</th>
+                        <th class="p-4">Thông Tin NH</th>
+                        <th class="p-4">Trạng Thái CK</th>
+                        <th class="p-4">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-sm">
+                    {% for bl in bang_luong_list %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-4">
+                            {% if bl.phuong_thuc_tra_luong == 'Chuyển khoản' and bl.trang_thai_chuyen_khoan == 'Chưa chuyển' %}
+                            <input type="checkbox" name="payroll_ids" value="{{ bl.id }}" 
+                                   form="transfer-form" class="payroll-checkbox rounded">
+                            {% endif %}
+                        </td>
+                        
+                        <td class="p-4">
+                            <div>
+                                <p class="font-medium text-gray-800">{{ bl.manhanvien.hoten }}</p>
+                                <p class="text-xs text-gray-500">{{ bl.manhanvien.manhanvien }}</p>
+                            </div>
+                        </td>
+                        
+                        <td class="p-4 font-medium text-green-600 currency">
+                            {{ bl.thuc_linh_net|currency_vnd }}
+                        </td>
+                        
+                        <td class="p-4">
+                            <form method="POST" action="{% url 'cap_nhat_phuong_thuc_tra_luong' %}" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="payroll_id" value="{{ bl.id }}">
+                                <select name="phuong_thuc" onchange="this.form.submit()" 
+                                        class="text-xs border rounded px-2 py-1 {% if bl.phuong_thuc_tra_luong == 'Chuyển khoản' %}bg-blue-50 text-blue-700{% else %}bg-gray-50 text-gray-700{% endif %}">
+                                    <option value="Tiền mặt" {% if bl.phuong_thuc_tra_luong == 'Tiền mặt' %}selected{% endif %}>Tiền mặt</option>
+                                    <option value="Chuyển khoản" {% if bl.phuong_thuc_tra_luong == 'Chuyển khoản' %}selected{% endif %}>Chuyển khoản</option>
+                                </select>
+                            </form>
+                        </td>
+                        
+                        <td class="p-4">
+                            {% if bl.manhanvien.ten_ngan_hang %}
+                                <div class="text-xs">
+                                    <p class="font-medium">{{ bl.manhanvien.ten_ngan_hang }}</p>
+                                    <p class="text-gray-500">{{ bl.manhanvien.so_tai_khoan }}</p>
+                                    <p class="text-gray-500">{{ bl.manhanvien.chu_tai_khoan }}</p>
+                                </div>
+                            {% else %}
+                                <span class="text-xs text-red-500">Chưa cập nhật</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td class="p-4">
+                            {% if bl.phuong_thuc_tra_luong == 'Chuyển khoản' %}
+                                <span class="px-2 py-1 rounded-full text-xs font-medium
+                                    {% if bl.trang_thai_chuyen_khoan == 'Chưa chuyển' %}bg-gray-100 text-gray-700
+                                    {% elif bl.trang_thai_chuyen_khoan == 'Đang xử lý' %}bg-yellow-100 text-yellow-700
+                                    {% elif bl.trang_thai_chuyen_khoan == 'Thành công' %}bg-green-100 text-green-700
+                                    {% else %}bg-red-100 text-red-700{% endif %}">
+                                    {{ bl.trang_thai_chuyen_khoan }}
+                                </span>
+                                {% if bl.ma_giao_dich %}
+                                    <p class="text-xs text-gray-500 mt-1">{{ bl.ma_giao_dich }}</p>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-xs text-gray-400">--</span>
+                            {% endif %}
+                        </td>
+                        
+                        <td class="p-4">
+                            <a href="{% url 'in_phieu_luong' bl.id %}" 
+                               class="text-blue-600 hover:text-blue-800 text-xs">
+                                <i data-lucide="printer" class="w-4 h-4 inline"></i> In phiếu
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="p-8 text-center text-gray-500">
+                            Không có dữ liệu lương cho tháng này.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Chọn tất cả checkbox
+document.getElementById('select-all').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.payroll-checkbox');
+    checkboxes.forEach(cb => cb.checked = this.checked);
+});
+
+// Xác nhận trước khi chuyển khoản
+document.getElementById('transfer-form').addEventListener('submit', function(e) {
+    const selected = document.querySelectorAll('.payroll-checkbox:checked').length;
+    if (selected === 0) {
+        e.preventDefault();
+        alert('Vui lòng chọn ít nhất một nhân viên để chuyển khoản.');
+        return;
+    }
+    
+    if (!confirm(`Bạn có chắc chắn muốn chuyển khoản cho ${selected} nhân viên?`)) {
+        e.preventDefault();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800 uppercase">Quản Lý Lương Cơ Bản & Hệ Số</h2>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-300 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-700 text-white">
+                    <tr>
+                        <th class="px-3 py-3 text-xs font-bold uppercase border-r border-slate-600 w-16">MS</th>
+                        <th class="px-4 py-3 text-xs font-bold uppercase border-r border-slate-600 min-w-[150px]">Họ và Tên</th>
+                        <th class="px-3 py-3 text-xs font-bold uppercase border-r border-slate-600 text-center min-w-[100px]">Chức Vụ</th>
+                        <th class="px-3 py-3 text-xs font-bold uppercase border-r border-slate-600 text-right min-w-[120px]">Lương CB (VND)</th>
+                        <th class="px-3 py-3 text-xs font-bold uppercase border-r border-slate-600 text-center min-w-[80px]">Hệ số Lương</th>
+                        
+                        <th class="px-3 py-3 text-xs font-bold uppercase border-r border-slate-600 text-center min-w-[80px]">Phụ cấp (HS)</th> 
+                        
+                        <th class="px-3 py-3 text-xs font-bold uppercase border-r border-slate-600 text-center min-w-[100px]">BHXH/YT/TN (%)</th>
+                        <th class="px-3 py-3 text-xs font-bold uppercase text-center w-24">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for nv in luong_data %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-3 py-2 text-sm font-medium text-center">{{ nv.manhanvien }}</td>
+                        <td class="px-4 py-2 text-sm">{{ nv.hoten }}</td>
+                        <td class="px-3 py-2 text-sm text-center">{{ nv.chucvu_ten }}</td> 
+                        
+                        <td class="px-3 py-2 text-sm font-bold text-right text-red-600">{{ nv.luong_cb|floatformat:0|intcomma }} VNĐ</td>
+                        
+                        <td class="px-3 py-2 text-sm text-center">{{ nv.he_so|floatformat:1 }}</td>
+                        
+                        <td class="px-3 py-2 text-sm text-center">{{ nv.he_so_phu_cap|default:"0.0"|floatformat:1 }}</td> 
+                        
+                        <td class="px-3 py-2 text-sm text-center">{{ nv.bh_phan_tram|floatformat:1 }}%</td>
+                        
+                        <td class="px-3 py-2 text-center">
+                            <a href="#" class="text-blue-600 hover:text-blue-800" title="Chỉnh sửa">
+                                <i data-lucide="edit-2" class="w-4 h-4 inline"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="p-8 text-center text-gray-500">Không tìm thấy dữ liệu lương cơ bản nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

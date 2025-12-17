@@ -1,0 +1,103 @@
+<!-- 
+    FILE: nhanvien/templates/nhanvien/manager_dashboard.html
+    Quyền: QuanLy (Manager)
+    Lưu ý: Không hiển thị thông tin tài chính/lương
+-->
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800">Tổng Quan Quản Lý</h2>
+    
+    <!-- Stat Cards (Ẩn Lương) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between card-hover">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Nhân sự phụ trách</p>
+                <h3 class="text-2xl font-bold text-gray-800">12</h3>
+            </div>
+            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between card-hover">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Đang nghỉ phép</p>
+                <h3 class="text-2xl font-bold text-gray-800">1</h3>
+            </div>
+            <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                <i data-lucide="calendar-clock" class="w-6 h-6"></i>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between card-hover">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Chờ duyệt đơn</p>
+                <h3 class="text-2xl font-bold text-gray-800">3</h3>
+            </div>
+            <div class="p-3 rounded-full bg-red-100 text-red-600">
+                <i data-lucide="file-clock" class="w-6 h-6"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Team Status Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Trạng thái làm việc hôm nay</h3>
+            <div class="chart-container flex justify-center">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Leave Requests Table -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Đơn xin nghỉ cần duyệt</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-2">Nhân viên</th>
+                            <th class="p-2">Lý do</th>
+                            <th class="p-2">Ngày</th>
+                            <th class="p-2">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr>
+                            <td class="p-2 font-medium">Nguyễn Văn A</td>
+                            <td class="p-2">Việc riêng</td>
+                            <td class="p-2">20/11</td>
+                            <td class="p-2 text-blue-600 cursor-pointer hover:underline">Duyệt</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 font-medium">Trần Thị B</td>
+                            <td class="p-2">Nghỉ ốm</td>
+                            <td class="p-2">21/11</td>
+                            <td class="p-2 text-blue-600 cursor-pointer hover:underline">Duyệt</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctxStatus = document.getElementById('statusChart').getContext('2d');
+        new Chart(ctxStatus, {
+            type: 'pie',
+            data: {
+                labels: ['Đang làm việc', 'Nghỉ phép', 'Công tác'],
+                datasets: [{
+                    data: [10, 1, 1],
+                    backgroundColor: ['#22c55e', '#f59e0b', '#3b82f6']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    });
+</script>
+{% endblock %}

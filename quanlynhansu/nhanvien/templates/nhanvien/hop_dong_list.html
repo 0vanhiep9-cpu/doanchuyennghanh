@@ -1,0 +1,218 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Quản Lý Hợp Đồng</h2>
+            <p class="text-gray-600">Quản lý tất cả hợp đồng lao động trong công ty</p>
+        </div>
+        {% if vaitro == 'Admin' %}
+        <a href="{% url 'them_hop_dong' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            Thêm Hợp Đồng Mới
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Thống kê -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Tổng Hợp Đồng</p>
+                    <h3 class="text-2xl font-bold text-gray-800">{{ tong_hop_dong }}</h3>
+                </div>
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i data-lucide="file-text" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Còn Hiệu Lực</p>
+                    <h3 class="text-2xl font-bold text-green-600">{{ hop_dong_con_han }}</h3>
+                </div>
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Hết Hạn</p>
+                    <h3 class="text-2xl font-bold text-red-600">{{ hop_dong_het_han }}</h3>
+                </div>
+                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                    <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <form method="GET" class="flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-48">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Loại Hợp Đồng</label>
+                <select name="loai" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Tất cả loại</option>
+                    <option value="thử việc" {% if loai_filter == 'thử việc' %}selected{% endif %}>Thử việc</option>
+                    <option value="có thời hạn" {% if loai_filter == 'có thời hạn' %}selected{% endif %}>Có thời hạn</option>
+                    <option value="không thời hạn" {% if loai_filter == 'không thời hạn' %}selected{% endif %}>Không thời hạn</option>
+                    <option value="thực tập" {% if loai_filter == 'thực tập' %}selected{% endif %}>Thực tập</option>
+                </select>
+            </div>
+
+            <div class="flex-1 min-w-48">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Trạng Thái</label>
+                <select name="trang_thai" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="con_han" {% if trang_thai_filter == 'con_han' %}selected{% endif %}>Còn hiệu lực</option>
+                    <option value="het_han" {% if trang_thai_filter == 'het_han' %}selected{% endif %}>Hết hạn</option>
+                </select>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    Lọc
+                </button>
+                <a href="{% url 'danh_sach_hop_dong' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                    Xóa lọc
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Danh sách hợp đồng -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="font-bold text-gray-800">Danh Sách Hợp Đồng</h3>
+        </div>
+
+        {% if hop_dong_data %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-gray-600 text-xs uppercase">
+                    <tr>
+                        <th class="px-6 py-3">Mã Hợp Đồng</th>
+                        <th class="px-6 py-3">Loại Hợp Đồng</th>
+                        <th class="px-6 py-3">Thời Hạn</th>
+                        <th class="px-6 py-3">Nhân Viên</th>
+                        <th class="px-6 py-3">Trạng Thái</th>
+                        <th class="px-6 py-3">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for item in hop_dong_data %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-800">{{ item.hop_dong.mahopdong }}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">
+                                {{ item.hop_dong.loaihopdong|title }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            <div>Từ: {{ item.hop_dong.ngaybatdau|date:"d/m/Y" }}</div>
+                            {% if item.hop_dong.ngayketthuc %}
+                            <div>Đến: {{ item.hop_dong.ngayketthuc|date:"d/m/Y" }}</div>
+                            {% else %}
+                            <div class="text-green-600 font-medium">Không thời hạn</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm">
+                                <div class="font-medium text-gray-800">{{ item.nhan_vien_count }} nhân viên</div>
+                                {% if item.nhan_vien_list %}
+                                <div class="text-gray-500 text-xs mt-1">
+                                    {% for nv in item.nhan_vien_list %}
+                                        {{ nv.hoten }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if item.nhan_vien_count > 5 %}...{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if item.is_expired %}
+                            <span class="px-2 py-1 rounded text-xs bg-red-100 text-red-700">
+                                <i data-lucide="alert-circle" class="w-3 h-3 inline mr-1"></i>
+                                Hết hạn
+                            </span>
+                            {% else %}
+                            <span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                                <i data-lucide="check-circle" class="w-3 h-3 inline mr-1"></i>
+                                Còn hiệu lực
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <a href="{% url 'chi_tiet_hop_dong' item.hop_dong.mahopdong %}" 
+                                   class="text-blue-600 hover:text-blue-800 p-1 rounded" title="Xem chi tiết">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </a>
+                                {% if vaitro == 'Admin' %}
+                                <a href="{% url 'chinh_sua_hop_dong' item.hop_dong.mahopdong %}" 
+                                   class="text-green-600 hover:text-green-800 p-1 rounded" title="Chỉnh sửa">
+                                    <i data-lucide="edit" class="w-4 h-4"></i>
+                                </a>
+                                {% if item.is_expired and item.hop_dong.ngayketthuc %}
+                                <a href="{% url 'gia_han_hop_dong' item.hop_dong.mahopdong %}" 
+                                   class="text-orange-600 hover:text-orange-800 p-1 rounded" title="Gia hạn">
+                                    <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                                </a>
+                                {% endif %}
+                                {% if item.nhan_vien_count == 0 %}
+                                <button onclick="confirmDelete('{{ item.hop_dong.mahopdong }}')" 
+                                        class="text-red-600 hover:text-red-800 p-1 rounded" title="Xóa">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="px-6 py-12 text-center">
+            <i data-lucide="file-text" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+            <p class="text-gray-500">Không có hợp đồng nào được tìm thấy</p>
+            {% if vaitro == 'Admin' %}
+            <a href="{% url 'them_hop_dong' %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                Thêm hợp đồng đầu tiên
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function confirmDelete(mahopdong) {
+    if (confirm(`Bạn có chắc chắn muốn xóa hợp đồng ${mahopdong}?`)) {
+        window.location.href = `{% url 'xoa_hop_dong' 'PLACEHOLDER' %}`.replace('PLACEHOLDER', mahopdong);
+    }
+}
+
+// Khởi tạo icons
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

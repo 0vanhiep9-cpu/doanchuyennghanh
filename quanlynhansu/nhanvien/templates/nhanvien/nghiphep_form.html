@@ -1,0 +1,58 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto mt-10">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
+            <h2 class="text-xl font-bold flex items-center gap-2">
+                <i data-lucide="file-plus" class="w-5 h-5"></i> Tạo Đơn Xin Nghỉ
+            </h2>
+            <a href="{% url 'nghiphep_list' %}" class="text-blue-200 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </a>
+        </div>
+        
+        <form method="POST" class="p-6 space-y-5">
+            {% csrf_token %}
+
+            {% if is_admin %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên</label>
+                <select name="manhanvien" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    {% for nv in nhanviens %}
+                    <option value="{{ nv.manhanvien }}" {% if nv.manhanvien == nv_hien_tai.manhanvien %}selected{% endif %}>
+                        {{ nv.manhanvien }} - {{ nv.hoten }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% else %}
+                <input type="hidden" name="manhanvien" value="{{ nv_hien_tai.manhanvien }}">
+            {% endif %}
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Từ ngày</label>
+                    <input type="date" name="ngaybatdau" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Đến ngày</label>
+                    <input type="date" name="ngayketthuc" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lý do nghỉ</label>
+                <textarea name="lydo" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ví dụ: Nghỉ phép năm, việc riêng..." required></textarea>
+            </div>
+
+            <div class="pt-2 flex justify-end gap-3">
+                <a href="{% url 'nghiphep_list' %}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">Hủy bỏ</a>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-md transition-transform active:scale-95">
+                    Gửi Đơn
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

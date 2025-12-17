@@ -1,0 +1,144 @@
+<!-- 
+    FILE: nhanvien/templates/nhanvien/admin_dashboard.html
+    Quyền: Admin
+-->
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800">Tổng Quan Quản Trị</h2>
+    
+    <!-- Stat Cards (Admin thấy cả Lương) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between card-hover">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Tổng Nhân Viên</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ total_employees|default:"34" }}</h3>
+            </div>
+            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between card-hover">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Phòng Ban</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ total_departments|default:"5" }}</h3>
+            </div>
+            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                <i data-lucide="building-2" class="w-6 h-6"></i>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between card-hover">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Hợp Đồng</p>
+                <h3 class="text-2xl font-bold text-gray-800">8</h3>
+                <p class="text-xs text-orange-600 mt-1">2 hết hạn</p>
+            </div>
+            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                <i data-lucide="file-text" class="w-6 h-6"></i>
+            </div>
+        </div>
+        
+        <!-- Chỉ Admin mới thấy tiền -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between card-hover">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Quỹ Lương (Est)</p>
+                <h3 class="text-xl font-bold text-gray-800">2,500,000,000 VNĐ</h3>
+            </div>
+            <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                <i data-lucide="wallet" class="w-6 h-6"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Department Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Phân bổ nhân sự theo Phòng Ban</h3>
+            <div class="chart-container">
+                <canvas id="deptChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Gender Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Cơ cấu Giới tính</h3>
+            <div class="chart-container flex justify-center">
+                <canvas id="genderChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities Table -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-bold text-gray-800">Nhân viên mới gia nhập gần đây</h3>
+            <a href="{% url 'danh_sach_nhan_vien' %}" class="text-sm text-blue-600 hover:underline">Xem tất cả</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-gray-50 text-gray-600 text-xs uppercase">
+                    <tr>
+                        <th class="px-6 py-3">Nhân viên</th>
+                        <th class="px-6 py-3">Phòng ban</th>
+                        <th class="px-6 py-3">Ngày vào</th>
+                        <th class="px-6 py-3">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <!-- Mock Data cho Admin -->
+                    <tr>
+                        <td class="px-6 py-3 font-medium text-gray-800">MS023 | Trần Văn Linh</td>
+                        <td class="px-6 py-3 text-gray-600">Phòng Marketing</td>
+                        <td class="px-6 py-3 text-gray-600">24/10/2024</td>
+                        <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">Đang làm</span></td>
+                    </tr>
+                    <tr>
+                        <td class="px-6 py-3 font-medium text-gray-800">MS017 | Trần Gia Khải</td>
+                        <td class="px-6 py-3 text-gray-600">Phòng Kinh doanh</td>
+                        <td class="px-6 py-3 text-gray-600">06/06/2024</td>
+                        <td class="px-6 py-3"><span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">Đang làm</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Biểu đồ Admin
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctxDept = document.getElementById('deptChart').getContext('2d');
+        new Chart(ctxDept, {
+            type: 'bar',
+            data: {
+                labels: ['Ban Lãnh Đạo', 'Kinh Doanh', 'Marketing', 'Kế Toán', 'Nhân Sự'],
+                datasets: [{
+                    label: 'Nhân viên',
+                    data: [2, 12, 8, 7, 5], // Mock data khớp với DB
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        const ctxGender = document.getElementById('genderChart').getContext('2d');
+        new Chart(ctxGender, {
+            type: 'doughnut',
+            data: {
+                labels: ['Nam', 'Nữ'],
+                datasets: [{
+                    data: [19, 15], // 34 nhân viên total
+                    backgroundColor: ['#0088FE', '#FF8042']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    });
+</script>
+{% endblock %}

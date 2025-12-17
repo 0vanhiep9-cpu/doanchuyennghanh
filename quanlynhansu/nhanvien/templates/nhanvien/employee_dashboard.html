@@ -1,0 +1,96 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg">
+        <h2 class="text-3xl font-bold mb-2">Xin chào, {{ user.nhanvien.hoten|default:user.username }}!</h2>
+        <p class="opacity-90 mb-6">Chúc bạn một ngày làm việc hiệu quả.</p>
+        <a href="{% url 'ho_so_ca_nhan' %}" class="inline-flex items-center bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition shadow-sm">
+            <i data-lucide="user" class="w-4 h-4 mr-2"></i> Xem hồ sơ của tôi
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-gray-500 text-sm">Phép năm còn lại</p>
+                    <h3 class="text-3xl font-bold text-gray-800">12 <span class="text-base font-normal text-gray-400">/ 12</span></h3>
+                </div>
+                <div class="p-2 bg-blue-50 rounded-lg text-blue-600">
+                    <i data-lucide="calendar" class="w-6 h-6"></i>
+                </div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-blue-600 h-2 rounded-full" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <p class="text-gray-500 text-sm">Hợp đồng hiện tại</p>
+                    <h3 class="text-xl font-bold text-gray-800">
+                        {{ user.nhanvien.mahopdong.loaihopdong|default:"Chưa cập nhật" }}
+                    </h3>
+                </div>
+                <div class="p-2 bg-orange-50 rounded-lg text-orange-600">
+                    <i data-lucide="file-check" class="w-6 h-6"></i>
+                </div>
+            </div>
+            <p class="text-sm text-gray-600">Hiệu lực: <span class="font-medium">{{ user.nhanvien.mahopdong.ngaybatdau|date:"d/m/Y"|default:"--" }}</span></p>
+            <p class="text-sm text-gray-600">Thời hạn: <span class="font-medium">
+                {% if user.nhanvien.mahopdong.ngayketthuc %}
+                    {{ user.nhanvien.mahopdong.ngayketthuc|date:"d/m/Y" }}
+                {% else %}
+                    Vô thời hạn
+                {% endif %}
+            </span></p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center space-y-3">
+            <p class="text-sm font-semibold text-gray-700 uppercase">Thao tác nhanh</p>
+            
+            <a href="{% url 'them_nghiphep' %}" class="w-full flex items-center p-3 rounded hover:bg-blue-50 text-gray-700 border border-gray-200 hover:border-blue-300 transition-colors group">
+                <i data-lucide="plus-circle" class="w-5 h-5 mr-3 text-blue-600 group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium group-hover:text-blue-700">Tạo đơn nghỉ phép</span>
+            </a>
+
+            <a href="{% url 'chamcong_list' %}" class="w-full flex items-center p-3 rounded hover:bg-orange-50 text-gray-700 border border-gray-200 hover:border-orange-300 transition-colors group">
+                <i data-lucide="clock" class="w-5 h-5 mr-3 text-orange-600 group-hover:scale-110 transition-transform"></i>
+                <span class="font-medium group-hover:text-orange-700">Chấm công ngay</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-bold text-gray-800">Thông báo mới nhất</h3>
+            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">Mới</span>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="flex gap-4 items-start p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 text-blue-600">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900">Thông báo lịch nghỉ lễ sắp tới</h4>
+                    <p class="text-sm text-gray-500 mt-1">Công ty sẽ nghỉ lễ Quốc Khánh từ ngày 02/09 đến hết ngày 03/09.</p>
+                    <span class="text-xs text-gray-400 mt-2 block">Hôm nay</span>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 items-start p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 text-green-600">
+                    <i data-lucide="check-circle" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 class="font-medium text-gray-900">Đã cập nhật bảng lương tháng 08/2025</h4>
+                    <p class="text-sm text-gray-500 mt-1">Vui lòng kiểm tra thông tin lương và phản hồi nếu có sai sót.</p>
+                    <a href="{% url 'tinh_luong_payroll' %}" class="text-xs text-blue-600 font-medium mt-2 inline-block hover:underline">Xem bảng lương &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

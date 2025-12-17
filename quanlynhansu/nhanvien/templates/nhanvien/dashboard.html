@@ -1,0 +1,106 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800">Tổng Quan Nhân Sự</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Tổng Nhân Viên</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ total_employees }}</h3>
+            </div>
+            <div class="p-3 rounded-full bg-blue-100">
+                <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+            </div>
+        </div>
+
+        <a href="{% url 'quanly_phong_ban' %}" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:border-green-400 cursor-pointer transition-all group">
+            <div>
+                <p class="text-sm text-gray-500 mb-1 group-hover:text-green-700 font-bold">Phòng Ban</p>
+                <h3 class="text-2xl font-bold text-gray-800">{{ total_departments }}</h3>
+                <span class="text-xs text-green-600 underline">Quản lý ngay &rarr;</span>
+            </div>
+            <div class="p-3 rounded-full bg-green-100 group-hover:bg-green-200">
+                <i data-lucide="building-2" class="w-6 h-6 text-green-600"></i>
+            </div>
+        </a>
+
+        <a href="{% url 'tuyendung_list' %}" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between hover:shadow-md hover:border-purple-400 cursor-pointer transition-all group">
+            <div>
+                <p class="text-sm text-gray-500 mb-1 group-hover:text-purple-700 font-bold">Tin Tuyển Dụng</p>
+                <h3 class="text-2xl font-bold text-gray-800">2</h3> <span class="text-xs text-purple-600 underline">Xem chi tiết &rarr;</span>
+            </div>
+            <div class="p-3 rounded-full bg-purple-100 group-hover:bg-purple-200">
+                <i data-lucide="briefcase" class="w-6 h-6 text-purple-600"></i>
+            </div>
+        </a>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+            <div>
+                <p class="text-sm text-gray-500 mb-1">Quỹ Lương (Est)</p>
+                <h3 class="text-2xl font-bold text-gray-800">2.5 Tỷ</h3>
+            </div>
+            <div class="p-3 rounded-full bg-orange-100">
+                <i data-lucide="wallet" class="w-6 h-6 text-orange-600"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Nhân sự theo Phòng Ban</h3>
+            <div class="h-80">
+                <canvas id="deptChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Tỉ lệ Giới tính</h3>
+            <div class="h-80 flex justify-center">
+                <canvas id="genderChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Biểu đồ Phòng Ban
+    const ctxDept = document.getElementById('deptChart').getContext('2d');
+    new Chart(ctxDept, {
+        type: 'bar',
+        data: {
+            labels: [{% for item in dept_data %}"{{ item.name }}",{% endfor %}],
+            datasets: [{
+                label: 'Số lượng nhân viên',
+                data: [{% for item in dept_data %}{{ item.count }},{% endfor %}],
+                backgroundColor: '#3b82f6',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Biểu đồ Giới tính
+    const ctxGender = document.getElementById('genderChart').getContext('2d');
+    new Chart(ctxGender, {
+        type: 'doughnut',
+        data: {
+            labels: ['Nam', 'Nữ'],
+            datasets: [{
+                data: [{{ gender_stats.male }}, {{ gender_stats.female }}],
+                backgroundColor: ['#0088FE', '#FF8042']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+{% endblock %}

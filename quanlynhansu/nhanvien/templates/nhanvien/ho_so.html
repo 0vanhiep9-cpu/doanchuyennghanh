@@ -1,0 +1,139 @@
+<!-- 
+    FILE: nhanvien/templates/nhanvien/ho_so.html
+    Lưu vào: quanlynhansu/nhanvien/templates/nhanvien/ho_so.html
+-->
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto space-y-6">
+    <!-- Header Banner -->
+    <div class="bg-slate-700 text-white p-6 rounded-t-xl shadow-lg flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold uppercase tracking-wide">HỒ SƠ NHÂN SỰ</h2>
+            <p class="opacity-80">Mã nhân viên: {{ nhanvien.manhanvien }}</p>
+        </div>
+        <div class="bg-white/10 p-2 rounded-lg">
+            <i data-lucide="user" class="w-8 h-8"></i>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Left Column - Photo & Core Info -->
+        <div class="md:col-span-1 space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center">
+                <div class="relative inline-block">
+                    {% if nhanvien.thongtinanh %}
+                        <img src="/media/avatars/{{ nhanvien.thongtinanh }}" alt="{{ nhanvien.hoten }}" class="w-48 h-64 object-cover rounded-lg shadow-md mx-auto mb-4">
+                    {% else %}
+                        <div class="w-48 h-64 bg-gray-200 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                            <i data-lucide="user" class="w-16 h-16 text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Status Dot -->
+                    {% if nhanvien.trangthai == 'Đang làm' %}
+                        <div class="absolute bottom-2 right-2 w-4 h-4 rounded-full border-2 border-white bg-green-500"></div>
+                    {% else %}
+                        <div class="absolute bottom-2 right-2 w-4 h-4 rounded-full border-2 border-white bg-red-500"></div>
+                    {% endif %}
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">{{ nhanvien.hoten }}</h3>
+                <p class="text-blue-600 font-medium">{{ nhanvien.machucvu.tenchucvu }}</p>
+                <p class="text-sm text-gray-500 mt-1">{{ nhanvien.maphongban.tenphongban }}</p>
+                <div class="mt-4 inline-block px-3 py-1 bg-gray-100 rounded-full text-sm font-medium text-gray-600">
+                    Giới tính: {{ nhanvien.gioitinh }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Detailed Info -->
+        <div class="md:col-span-2 space-y-6">
+            <!-- General Info Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+                    <i data-lucide="file-text" class="text-blue-600 w-5 h-5"></i>
+                    <h3 class="font-bold text-gray-800 uppercase">Thông tin tổng quan</h3>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 gap-y-4">
+                        <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 col-span-1">Ngày sinh</span>
+                            <span class="font-medium text-gray-800 col-span-2">: {{ nhanvien.ngaysinh|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 col-span-1">Số điện thoại</span>
+                            <span class="font-medium text-gray-800 col-span-2">: {{ nhanvien.sdt }}</span>
+                        </div>
+                        <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 col-span-1">Email</span>
+                            <span class="font-medium text-gray-800 col-span-2">: {{ nhanvien.email }}</span>
+                        </div>
+                        <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 col-span-1">CCCD/CMND</span>
+                            <span class="font-medium text-gray-800 col-span-2">: {{ nhanvien.cccd }}</span>
+                        </div>
+                         <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 col-span-1">Trình độ</span>
+                            <span class="font-medium text-gray-800 col-span-2">: {{ nhanvien.trinhdototnghiep }}</span>
+                        </div>
+                         <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 col-span-1">Nơi ở hiện nay</span>
+                            <span class="font-medium text-gray-800 col-span-2">: {{ nhanvien.diachihientai }}</span>
+                        </div>
+                        <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                            <span class="text-gray-500 col-span-1">Ngày gia nhập</span>
+                            <span class="font-medium text-gray-800 col-span-2">: {{ nhanvien.ngaynhap|date:"d/m/Y" }}</span>
+                        </div>
+                         {% if nhanvien.ngaynghi %}
+                            <div class="grid grid-cols-3 border-b border-gray-100 pb-2">
+                                <span class="text-red-500 col-span-1">Ngày nghỉ việc</span>
+                                <span class="font-medium text-red-600 col-span-2">: {{ nhanvien.ngaynghi|date:"d/m/Y" }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contract Info Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex items-center gap-2">
+                    <i data-lucide="briefcase" class="text-orange-500 w-5 h-5"></i>
+                    <h3 class="font-bold text-gray-800 uppercase">Thông tin hợp đồng</h3>
+                </div>
+                <div class="p-6">
+                    {% if nhanvien.mahopdong %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Số Hợp Đồng</p>
+                                <p class="font-medium text-gray-900">{{ nhanvien.mahopdong.mahopdong }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Loại Hợp Đồng</p>
+                                <span class="inline-block px-2 py-1 bg-orange-100 text-orange-800 rounded text-sm font-medium">
+                                    {{ nhanvien.mahopdong.loaihopdong }}
+                                </span>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Ngày bắt đầu</p>
+                                <p class="font-medium text-gray-900">{{ nhanvien.mahopdong.ngaybatdau|date:"d/m/Y" }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 mb-1">Ngày kết thúc</p>
+                                <p class="font-medium text-gray-900">
+                                    {% if nhanvien.mahopdong.ngayketthuc %}
+                                        {{ nhanvien.mahopdong.ngayketthuc|date:"d/m/Y" }}
+                                    {% else %}
+                                        Vô thời hạn
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500 italic">Chưa có thông tin hợp đồng</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

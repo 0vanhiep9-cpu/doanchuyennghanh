@@ -1,0 +1,92 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center bg-slate-800 p-6 rounded-xl text-white shadow-lg">
+        <div>
+            <h2 class="text-2xl font-bold uppercase tracking-wide">Danh Sách Ứng Viên</h2>
+            <p class="text-slate-400 text-sm mt-1">Quản lý hồ sơ và tiến trình tuyển dụng</p>
+        </div>
+        <a href="{% url 'them_ung_vien' %}" class="bg-green-500 text-white px-5 py-2.5 rounded-lg hover:bg-green-600 flex items-center gap-2 font-bold shadow-md transition-transform active:scale-95">
+            <i data-lucide="user-plus" class="w-5 h-5"></i> Thêm Mới
+        </a>
+    </div>
+
+    <form method="GET" class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex items-center gap-4">
+        <i data-lucide="filter" class="text-gray-400 w-5 h-5"></i>
+        <span class="font-medium text-gray-700">Vị trí ứng tuyển:</span>
+        <select name="job" class="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-gray-700 bg-white w-full md:w-auto" onchange="this.form.submit()">
+            <option value="">-- Tất cả vị trí --</option>
+            {% for job in jobs %}
+                <option value="{{ job.ma_job }}" {% if job_filter == job.ma_job %}selected{% endif %}>
+                    {{ job.ma_job }} - {{ job.vi_tri_cong_viec }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead class="bg-gray-100 text-gray-700 font-bold uppercase border-b border-gray-300">
+                    <tr>
+                        <th class="p-3 text-center w-16">Mã CV</th>
+                        <th class="p-3 w-32">Phòng Ban</th>
+                        <th class="p-3 w-48">Vị Trí Tuyển Dụng</th>
+                        <th class="p-3">Tên Ứng Viên</th>
+                        <th class="p-3 text-center">Ngày Sinh</th>
+                        <th class="p-3 text-center w-16">Giới Tính</th>
+                        <th class="p-3 w-32">Giai Đoạn</th>
+                        <th class="p-3 text-center w-32">Trạng Thái</th>
+                        <th class="p-3 text-center w-20">Sửa/Xóa</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for uv in ungviens %}
+                    <tr class="hover:bg-blue-50 transition-colors">
+                        <td class="p-3 text-center font-medium text-gray-500">{{ uv.ma_ung_vien }}</td>
+                        <td class="p-3 text-gray-600">{{ uv.ma_job.maphongban.tenphongban|default:"--" }}</td>
+                        <td class="p-3 font-medium text-gray-800">{{ uv.ma_job.vi_tri_cong_viec|default:"--" }}</td>
+                        <td class="p-3 font-bold text-blue-700">
+                            {{ uv.ho_ten }}<br>
+                            <span class="text-xs font-normal text-gray-500">{{ uv.email }}</span>
+                        </td>
+                        <td class="p-3 text-center text-gray-600">{{ uv.ngay_sinh|date:"d/m/Y" }}</td>
+                        <td class="p-3 text-center">{{ uv.gioi_tinh }}</td>
+                        
+                        <td class="p-3">
+                            <span class="px-2 py-1 rounded text-xs font-semibold block text-center
+                                {% if uv.giai_doan == 'Phỏng vấn' %}bg-orange-100 text-orange-700
+                                {% elif uv.giai_doan == 'Mời Offer' %}bg-purple-100 text-purple-700
+                                {% elif uv.giai_doan == 'Kiểm tra' %}bg-blue-100 text-blue-700
+                                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {{ uv.giai_doan }}
+                            </span>
+                        </td>
+                        
+                        <td class="p-3 text-center">
+                            <span class="px-2 py-1 rounded text-xs font-bold block text-center
+                                {% if uv.trang_thai == 'Tuyển dụng' %}bg-green-100 text-green-700
+                                {% elif uv.trang_thai == 'Không tuyển' %}bg-gray-200 text-gray-500
+                                {% elif uv.trang_thai == 'Từ chối offer' %}bg-red-100 text-red-700
+                                {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                                {{ uv.trang_thai }}
+                            </span>
+                        </td>
+
+                        <td class="p-3 text-center flex justify-center gap-2">
+                            <a href="{% url 'sua_ung_vien' uv.ma_ung_vien %}" class="text-blue-600 hover:text-blue-800 p-1 hover:bg-blue-100 rounded">
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
+                            </a>
+                            <a href="{% url 'xoa_ung_vien' uv.ma_ung_vien %}" onclick="return confirm('Xóa ứng viên này?')" class="text-red-600 hover:text-red-800 p-1 hover:bg-red-100 rounded">
+                                <i data-lucide="trash" class="w-4 h-4"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

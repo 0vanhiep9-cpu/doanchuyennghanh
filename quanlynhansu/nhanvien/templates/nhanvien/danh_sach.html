@@ -1,0 +1,119 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-4">
+    <div class="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
+        <h2 class="text-xl font-bold text-gray-800 uppercase">Danh Sách Nhân Sự</h2>
+        <a href="{% url 'them_moi_nhan_vien' %}" class="flex items-center gap-2 bg-[#2563eb] text-white px-4 py-1.5 rounded shadow-sm text-sm font-medium hover:bg-blue-700 transition">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Thêm mới</span>
+        </a>
+    </div>
+
+    <form method="GET" class="bg-white p-3 rounded shadow-sm border border-gray-200 flex flex-col md:flex-row gap-3">
+        <div class="relative flex-1">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"></i>
+            <input 
+                type="text" 
+                name="q" 
+                value="{{ request.GET.q }}"
+                placeholder="Tìm kiếm tên, mã nhân viên..." 
+                class="w-full pl-9 pr-4 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none text-sm"
+            >
+        </div>
+        <div class="relative min-w-[220px]">
+            <i data-lucide="filter" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-3.5 h-3.5"></i>
+            <select name="phongban" onchange="this.form.submit()" class="w-full pl-8 pr-4 py-1.5 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:outline-none appearance-none bg-white text-sm">
+                <option value="">Tất cả phòng ban</option>
+                {% for pb in phongbans %}
+                    <option value="{{ pb.maphongban }}" {% if request.GET.phongban == pb.maphongban %}selected{% endif %}>
+                        {{ pb.tenphongban }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+    <div class="bg-white rounded shadow-sm border border-gray-300 overflow-hidden">
+        <div class="overflow-x-auto"> 
+            <table class="w-full text-left border-collapse min-w-[1200px]"> 
+                <thead class="bg-[#528bc5] text-white">
+                    <tr>
+                        <th class="px-2 py-2 text-xs font-bold uppercase border-r border-blue-400 w-16 text-center whitespace-nowrap">Ảnh</th>
+                        <th class="px-2 py-2 text-xs font-bold uppercase border-r border-blue-400 w-20 text-center whitespace-nowrap">MS</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase border-r border-blue-400 min-w-[150px] whitespace-nowrap">Tên nhân viên</th> 
+                        <th class="px-2 py-2 text-xs font-bold uppercase border-r border-blue-400 w-20 text-center whitespace-nowrap">GT</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase border-r border-blue-400 min-w-[150px] whitespace-nowrap">Vị trí chức danh</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase border-r border-blue-400 min-w-[120px] whitespace-nowrap">Phòng ban</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase border-r border-blue-400 w-28 text-center whitespace-nowrap">Ngày sinh</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase border-r border-blue-400 w-28 text-center whitespace-nowrap">Ngày vào</th>
+                        <th class="px-3 py-2 text-xs font-bold uppercase border-r border-blue-400 w-32 text-center whitespace-nowrap">Trạng thái</th>
+                        <th class="px-2 py-2 text-xs font-bold uppercase text-center w-24 whitespace-nowrap">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for nv in nhanviens %}
+                    <tr class="hover:bg-blue-50 transition text-sm {% cycle 'bg-white' 'bg-gray-50' %}">
+                        <td class="px-2 py-1.5 border-r border-gray-200 text-center">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mx-auto">
+                                {% if nv.thongtinanh %}
+                                    <img src="/media/avatars/{{ nv.thongtinanh }}" alt="{{ nv.hoten }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                                        <i data-lucide="user" class="w-4 h-4 text-gray-400"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="px-2 py-1.5 font-medium text-gray-900 border-r border-gray-200 text-center whitespace-nowrap">
+                            {{ nv.manhanvien }}
+                        </td>
+                        <td class="px-3 py-1.5 text-gray-900 font-medium border-r border-gray-200 whitespace-nowrap">
+                            {{ nv.hoten }}
+                        </td>
+                        <td class="px-2 py-1.5 text-center border-r border-gray-200 whitespace-nowrap">
+                            {% if nv.gioitinh == 'Nam' %}
+                                <span class="px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700">Nam</span>
+                            {% else %}
+                                <span class="px-2 py-0.5 rounded text-xs bg-pink-50 text-pink-700">Nữ</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-3 py-1.5 text-gray-700 border-r border-gray-200 whitespace-nowrap">{{ nv.machucvu.tenchucvu }}</td>
+                        <td class="px-3 py-1.5 text-gray-700 border-r border-gray-200 whitespace-nowrap">{{ nv.maphongban.tenphongban }}</td>
+                        <td class="px-3 py-1.5 text-gray-600 border-r border-gray-200 text-center whitespace-nowrap">{{ nv.ngaysinh|date:"d/m/Y" }}</td>
+                        <td class="px-3 py-1.5 text-gray-600 border-r border-gray-200 text-center whitespace-nowrap">{{ nv.ngaynhap|date:"d/m/Y" }}</td>
+                        <td class="px-3 py-1.5 border-r border-gray-200 text-center whitespace-nowrap">
+                            {% if nv.trangthai == 'Đang làm' %}
+                                <span class="text-xs text-green-600 font-semibold">● Đang làm</span>
+                            {% elif nv.trangthai == 'Đã nghỉ việc' %}
+                                <span class="text-xs text-red-600 font-semibold">● Đã nghỉ việc</span>
+                            {% else %}
+                                <span class="text-xs text-yellow-600 font-semibold">● {{ nv.trangthai }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-1.5 text-center whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1">
+                                <a href="{% url 'chi_tiet_nhan_vien' nv.manhanvien %}" class="p-1 text-blue-600 hover:bg-blue-100 rounded transition" title="Xem chi tiết">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                </a>
+                                <a href="{% url 'chinh_sua_nhan_vien' nv.manhanvien %}" class="p-1 text-gray-600 hover:bg-gray-200 rounded transition" title="Chỉnh sửa">
+                                    <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="p-8 text-center text-gray-500">Không tìm thấy nhân viên nào phù hợp.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="text-xs text-gray-500 text-right">
+        Tổng số: <strong>{{ nhanviens|length }}</strong> nhân viên
+    </div>
+</div>
+{% endblock %}

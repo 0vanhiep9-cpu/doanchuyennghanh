@@ -1,0 +1,231 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row justify-between gap-4 items-start sm:items-center">
+        <h2 class="text-xl font-bold text-gray-800 uppercase">Quản Lý Phòng Ban</h2>
+        <a href="#" class="flex items-center gap-2 bg-[#2563eb] text-white px-4 py-2 rounded shadow-sm text-sm font-medium hover:bg-blue-700 transition">
+            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+            <span>Thêm Phòng Ban</span>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition duration-200 overflow-hidden group">
+            <div class="h-2 bg-blue-600"></div>
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition">
+                        <i data-lucide="briefcase" class="w-6 h-6"></i>
+                    </div>
+                    <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded">PB01</span>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-1">Ban Lãnh Đạo</h3>
+                <p class="text-sm text-gray-500 mb-4">Quản lý và điều hành chung</p>
+                
+                <div class="space-y-3 text-sm border-t border-gray-100 pt-4">
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        Tầng 10, Tòa nhà CEO
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        0901
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="users" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        <span class="font-medium text-gray-900 mr-1">5</span> nhân sự
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-2">
+                    <a href="{% url 'chitiet_phong_ban' 'PB01' %}" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200 transition">
+                        Chi tiết
+                    </a>
+                    <button class="p-2 text-gray-400 hover:text-blue-600 border border-gray-200 rounded hover:border-blue-200 bg-white transition">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </button>
+                    {% if user.is_superuser %}
+                    <a href="#" class="p-2 text-gray-400 hover:text-red-600 border border-gray-200 rounded hover:border-red-200 bg-white transition" title="Xóa">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition duration-200 overflow-hidden group">
+            <div class="h-2 bg-green-500"></div>
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-green-50 text-green-600 rounded-lg group-hover:bg-green-600 group-hover:text-white transition">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                    <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded">PB02</span>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-1">Phòng Kinh Doanh</h3>
+                <p class="text-sm text-gray-500 mb-4">Phát triển thị trường & Doanh số</p>
+                
+                <div class="space-y-3 text-sm border-t border-gray-100 pt-4">
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        Tầng 4
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        0902
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="users" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        <span class="font-medium text-gray-900 mr-1">12</span> nhân sự
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-2">
+                    <a href="{% url 'chitiet_phong_ban' 'PB02' %}" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200 transition">
+                        Chi tiết
+                    </a>
+                    <button class="p-2 text-gray-400 hover:text-blue-600 border border-gray-200 rounded hover:border-blue-200 bg-white transition">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </button>
+                    {% if user.is_superuser %}
+                    <a href="#" class="p-2 text-gray-400 hover:text-red-600 border border-gray-200 rounded hover:border-red-200 bg-white transition" title="Xóa">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition duration-200 overflow-hidden group">
+            <div class="h-2 bg-purple-500"></div>
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:bg-purple-600 group-hover:text-white transition">
+                        <i data-lucide="megaphone" class="w-6 h-6"></i>
+                    </div>
+                    <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded">PB03</span>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-1">Phòng Marketing</h3>
+                <p class="text-sm text-gray-500 mb-4">Quảng bá thương hiệu & Truyền thông</p>
+                
+                <div class="space-y-3 text-sm border-t border-gray-100 pt-4">
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        Tầng 3
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        0903
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="users" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        <span class="font-medium text-gray-900 mr-1">8</span> nhân sự
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-2">
+                    <a href="{% url 'chitiet_phong_ban' 'PB03' %}" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200 transition">
+                        Chi tiết
+                    </a>
+                    <button class="p-2 text-gray-400 hover:text-blue-600 border border-gray-200 rounded hover:border-blue-200 bg-white transition">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </button>
+                    {% if user.is_superuser %}
+                    <a href="#" class="p-2 text-gray-400 hover:text-red-600 border border-gray-200 rounded hover:border-red-200 bg-white transition" title="Xóa">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition duration-200 overflow-hidden group">
+            <div class="h-2 bg-orange-500"></div>
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-orange-50 text-orange-600 rounded-lg group-hover:bg-orange-600 group-hover:text-white transition">
+                        <i data-lucide="calculator" class="w-6 h-6"></i>
+                    </div>
+                    <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded">PB04</span>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-1">Phòng Kế Toán</h3>
+                <p class="text-sm text-gray-500 mb-4">Tài chính & Kế toán</p>
+                
+                <div class="space-y-3 text-sm border-t border-gray-100 pt-4">
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        Tầng 2
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        0904
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="users" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        <span class="font-medium text-gray-900 mr-1">7</span> nhân sự
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-2">
+                    <a href="{% url 'chitiet_phong_ban' 'PB04' %}" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200 transition">
+                        Chi tiết
+                    </a>
+                    <button class="p-2 text-gray-400 hover:text-blue-600 border border-gray-200 rounded hover:border-blue-200 bg-white transition">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </button>
+                    {% if user.is_superuser %}
+                    <a href="#" class="p-2 text-gray-400 hover:text-red-600 border border-gray-200 rounded hover:border-red-200 bg-white transition" title="Xóa">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition duration-200 overflow-hidden group">
+            <div class="h-2 bg-pink-500"></div>
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-pink-50 text-pink-600 rounded-lg group-hover:bg-pink-600 group-hover:text-white transition">
+                        <i data-lucide="heart-handshake" class="w-6 h-6"></i>
+                    </div>
+                    <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded">PB05</span>
+                </div>
+                <h3 class="text-lg font-bold text-gray-800 mb-1">Phòng Nhân Sự</h3>
+                <p class="text-sm text-gray-500 mb-4">Tuyển dụng & Đào tạo</p>
+                
+                <div class="space-y-3 text-sm border-t border-gray-100 pt-4">
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        Tầng 1
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="phone" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        0905
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <i data-lucide="users" class="w-4 h-4 mr-2 text-gray-400"></i>
+                        <span class="font-medium text-gray-900 mr-1">5</span> nhân sự
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-2">
+                    <a href="{% url 'chitiet_phong_ban' 'PB05' %}" class="flex-1 text-center bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded text-sm font-medium border border-gray-200 transition">
+                        Chi tiết
+                    </a>
+                    <button class="p-2 text-gray-400 hover:text-blue-600 border border-gray-200 rounded hover:border-blue-200 bg-white transition">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </button>
+                    {% if user.is_superuser %}
+                    <a href="#" class="p-2 text-gray-400 hover:text-red-600 border border-gray-200 rounded hover:border-red-200 bg-white transition" title="Xóa">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

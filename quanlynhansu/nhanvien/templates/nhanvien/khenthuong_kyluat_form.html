@@ -1,0 +1,67 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center">
+            <h2 class="text-xl font-bold">
+                {% if is_adding %}Thêm Mới Khen Thưởng / Kỷ Luật{% else %}Chỉnh Sửa Bản Ghi{% endif %}
+            </h2>
+            <a href="{% url 'danh_sach_khenthuong_kyluat' %}" class="text-gray-300 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </a>
+        </div>
+        
+        <form method="POST" class="p-6 space-y-4">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nhân Viên</label>
+                {% if is_adding %}
+                    <select name="manhanvien" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                        <option value="">-- Chọn nhân viên --</option>
+                        {% for nv in nhanviens %}
+                            <option value="{{ nv.manhanvien }}">{{ nv.manhanvien }} - {{ nv.hoten }}</option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <input type="text" value="{{ item.manhanvien.manhanvien }} - {{ item.manhanvien.hoten }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-gray-100 text-gray-500" disabled>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Loại</label>
+                    <select name="loai" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="Khen thưởng" {% if item.loai == 'Khen thưởng' %}selected{% endif %}>Khen thưởng</option>
+                        <option value="Kỷ luật" {% if item.loai == 'Kỷ luật' %}selected{% endif %}>Kỷ luật</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ngày thực hiện</label>
+                    <input type="date" name="ngaythuchien" value="{{ item.ngaythuchien|date:'Y-m-d' }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Lý do / Nội dung</label>
+                <textarea name="lydo" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" required>{{ item.lydo }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Số tiền (VNĐ)</label>
+                <input type="number" name="sotien" value="{{ item.sotien|stringformat:'f' }}" placeholder="Nhập số dương, hệ thống tự chuyển âm nếu là Kỷ luật" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                <p class="text-xs text-gray-500 mt-1">Với Kỷ luật, bạn có thể nhập số dương, hệ thống sẽ tự động lưu thành số âm.</p>
+            </div>
+
+            <div class="pt-4 flex justify-end gap-3">
+                <a href="{% url 'danh_sach_khenthuong_kyluat' %}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Hủy bỏ</a>
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-md">
+                    {% if is_adding %}Lưu Mới{% else %}Cập Nhật{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

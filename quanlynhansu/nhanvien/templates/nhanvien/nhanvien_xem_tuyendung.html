@@ -1,0 +1,195 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="flex items-center gap-4">
+            <div class="p-3 bg-white/20 rounded-lg">
+                <i data-lucide="briefcase" class="w-8 h-8"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-bold">Thông Tin Tuyển Dụng</h2>
+                <p class="text-blue-100">Các vị trí đang tuyển dụng tại công ty</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thống kê nhanh -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Vị Trí Đang Mở</p>
+                    <h3 class="text-2xl font-bold text-green-600">{{ jobs.count }}</h3>
+                </div>
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <i data-lucide="briefcase" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Cơ Hội Nghề Nghiệp</p>
+                    <h3 class="text-2xl font-bold text-blue-600">Đa Dạng</h3>
+                </div>
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <i data-lucide="trending-up" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1">Môi Trường</p>
+                    <h3 class="text-2xl font-bold text-purple-600">Thân Thiện</h3>
+                </div>
+                <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <i data-lucide="heart" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách vị trí tuyển dụng -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100">
+            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                <i data-lucide="search" class="w-5 h-5 text-blue-600"></i>
+                Các Vị Trí Đang Tuyển Dụng
+            </h3>
+        </div>
+
+        {% if jobs %}
+        <div class="divide-y divide-gray-100">
+            {% for job in jobs %}
+            <div class="p-6 hover:bg-gray-50 transition-colors">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-blue-100 text-blue-600 rounded-lg flex-shrink-0">
+                                <i data-lucide="briefcase" class="w-6 h-6"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="text-lg font-semibold text-gray-800 mb-2">{{ job.vi_tri_cong_viec }}</h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="building-2" class="w-4 h-4 text-gray-400"></i>
+                                        <span>{{ job.maphongban.tenphongban|default:"Chưa phân công" }}</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="users" class="w-4 h-4 text-gray-400"></i>
+                                        <span>Tuyển {{ job.so_luong_tuyen }} người</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="calendar" class="w-4 h-4 text-gray-400"></i>
+                                        <span>Mở từ: {{ job.ngay_mo_don|date:"d/m/Y" }}</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="dollar-sign" class="w-4 h-4 text-gray-400"></i>
+                                        <span>{{ job.muc_luong_du_kien|floatformat:0 }} VNĐ</span>
+                                    </div>
+                                </div>
+
+                                {% if job.mo_ta_cong_viec %}
+                                <div class="mt-3">
+                                    <p class="text-gray-600 text-sm">{{ job.mo_ta_cong_viec|truncatewords:20 }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-end gap-3">
+                        <!-- Trạng thái -->
+                        <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            <i data-lucide="check-circle" class="w-3 h-3 inline mr-1"></i>
+                            {{ job.trang_thai }}
+                        </span>
+
+                        <!-- Thông tin người tuyển dụng -->
+                        {% if job.nguoi_tuyen_dung %}
+                        <div class="text-right text-sm text-gray-500">
+                            <p class="font-medium">Liên hệ:</p>
+                            <p>{{ job.nguoi_tuyen_dung.hoten }}</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Ngày onboard dự kiến -->
+                        {% if job.ngay_onboard_du_kien %}
+                        <div class="text-right text-sm text-gray-500">
+                            <p class="font-medium">Onboard dự kiến:</p>
+                            <p>{{ job.ngay_onboard_du_kien|date:"d/m/Y" }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="px-6 py-12 text-center">
+            <i data-lucide="briefcase" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+            <p class="text-gray-500 text-lg font-medium">Hiện tại chưa có vị trí tuyển dụng nào</p>
+            <p class="text-gray-400 text-sm">Vui lòng quay lại sau để xem các cơ hội mới</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Thông tin liên hệ -->
+    <div class="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-6">
+        <h4 class="font-medium text-green-800 mb-3 flex items-center gap-2">
+            <i data-lucide="info" class="w-5 h-5"></i>
+            Thông Tin Liên Hệ
+        </h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-green-700">
+            <div>
+                <p class="font-medium">📧 Email HR:</p>
+                <p>hr@company.com</p>
+            </div>
+            <div>
+                <p class="font-medium">📞 Hotline:</p>
+                <p>1900-xxxx</p>
+            </div>
+            <div>
+                <p class="font-medium">📍 Địa chỉ:</p>
+                <p>Tòa nhà Bitexco Financial Tower, TP.HCM</p>
+            </div>
+            <div>
+                <p class="font-medium">⏰ Thời gian làm việc:</p>
+                <p>8:00 - 17:30 (Thứ 2 - Thứ 6)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lưu ý -->
+    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <h4 class="font-medium text-blue-800 mb-2 flex items-center gap-2">
+            <i data-lucide="lightbulb" class="w-4 h-4"></i>
+            Lưu Ý Cho Ứng Viên
+        </h4>
+        <ul class="text-sm text-blue-700 space-y-1">
+            <li>• Thông tin tuyển dụng có thể thay đổi theo thời gian</li>
+            <li>• Vui lòng liên hệ trực tiếp với bộ phận HR để biết thêm chi tiết</li>
+            <li>• Công ty luôn chào đón những ứng viên tài năng và nhiệt huyết</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Khởi tạo icons
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+});
+</script>
+{% endblock %}

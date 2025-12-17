@@ -1,0 +1,115 @@
+{% extends 'nhanvien/base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="space-y-6">
+    <h2 class="text-2xl font-bold text-gray-800 uppercase">Xử Lý & Tính Toán Lương</h2>
+    <p class="text-gray-600">Tháng đang xử lý: <strong>{{ thang_hien_tai|date:"m/Y" }}</strong></p>
+
+    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+        <h3 class="text-lg font-semibold mb-4 border-b pb-2 text-blue-600">Bảng Nhập Ngày Công & OT</h3>
+        
+        <form method="POST" action="{% url 'tinh_luong_payroll' %}">
+            {% csrf_token %}
+            <div class="overflow-x-auto max-h-96">
+                <table class="w-full text-sm">
+                    <thead class="sticky top-0 bg-gray-100 z-10">
+                        <tr>
+                            <th class="p-2 text-left w-16">MS</th>
+                            <th class="p-2 text-left min-w-[150px]">Họ Tên</th>
+                            <th class="p-2 text-center w-24">Công Chuẩn</th>
+                            <th class="p-2 text-center w-28 text-red-600">Công Thực Tế*</th>
+                            <th class="p-2 text-center w-28 text-orange-600">Công OT*</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for nv in nhanviens %}
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-2">{{ nv.manhanvien }}</td>
+                            <td class="p-2 font-medium">{{ nv.hoten }}</td>
+                            <td class="p-2 text-center">26</td>
+                            <td class="p-2">
+                                <input type="number" step="0.5" name="cong_thuc_te_{{ nv.manhanvien }}" value="26" class="w-full border border-gray-300 rounded px-2 py-1 text-center focus:ring-2 focus:ring-blue-500 outline-none">
+                            </td>
+                            <td class="p-2">
+                                <input type="number" step="0.5" name="cong_ot_{{ nv.manhanvien }}" value="0" class="w-full border border-gray-300 rounded px-2 py-1 text-center focus:ring-2 focus:ring-orange-500 outline-none">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 shadow-md transition-transform active:scale-95">
+                    <i data-lucide="calculator" class="w-5 h-5"></i> Tính & Lưu Bảng Lương
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+        <h3 class="text-lg font-semibold mb-4 border-b pb-2 text-green-600">Kết Quả Bảng Lương Đã Tính (Chi Tiết)</h3>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm whitespace-nowrap">
+                <thead class="bg-slate-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">MS</th>
+                        <th class="p-3 text-left">Họ Tên</th>
+                        <th class="p-3 text-right">Lương CB</th>
+                        <th class="p-3 text-right">Phụ Cấp</th>
+                        <th class="p-3 text-right font-bold bg-slate-700">Gross</th>
+                        <th class="p-3 text-right text-orange-300">BHXH/YT/TN</th>
+                        <th class="p-3 text-right text-red-300">Thuế TNCN</th>
+                        <th class="p-3 text-right font-bold text-green-400 bg-slate-900">NET (Thực Lĩnh)</th>
+                        <th class="p-3 text-center">Chi Tiết</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for row in bang_luong_da_tinh %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-3 font-medium">{{ row.manhanvien.manhanvien }}</td>
+                        <td class="p-3">{{ row.manhanvien.hoten }}</td>
+                        
+                        <td class="p-3 text-right">{{ row.luong_thuc_te|floatformat:0|intcomma }} đ</td>
+                        
+                        <td class="p-3 text-right">
+                            {{ row.phucap_antrua|add:row.phu_cap_xang_xe|add:row.phu_cap_khac|floatformat:0|intcomma }} đ
+                        </td>
+                        
+                        <td class="p-3 text-right font-bold bg-gray-50 text-blue-700">
+                            {{ row.tong_thu_nhap_gross|floatformat:0|intcomma }} đ
+                        </td>
+                        
+                        <td class="p-3 text-right text-orange-600">
+                            {{ row.trich_bhxh|add:row.trich_bhyt|add:row.trich_bhtn|floatformat:0|intcomma }} đ
+                        </td>
+                        
+                        <td class="p-3 text-right text-red-600">
+                            {{ row.thue_tncn|floatformat:0|intcomma }} đ
+                        </td>
+                        
+                        <td class="p-3 text-right font-bold text-green-700 bg-green-50 text-base">
+                            {{ row.thuc_linh_net|floatformat:0|intcomma }} đ
+                        </td>
+
+                        <td class="p-3 text-center">
+                            <a href="{% url 'in_phieu_luong' row.id %}" target="_blank" class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors" title="Xem Phiếu Lương">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="p-8 text-center text-gray-500 italic">
+                            Chưa có dữ liệu lương tháng này. Vui lòng nhấn nút "Tính & Lưu" ở trên.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

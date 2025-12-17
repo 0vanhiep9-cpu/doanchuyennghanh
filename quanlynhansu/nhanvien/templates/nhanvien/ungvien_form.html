@@ -1,0 +1,127 @@
+{% extends 'nhanvien/base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-6">
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        
+        <div class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center">
+            <h2 class="text-xl font-bold flex items-center gap-2">
+                {% if is_adding %}
+                    <i data-lucide="user-plus" class="w-5 h-5"></i> Thêm Mới Ứng Viên
+                {% else %}
+                    <i data-lucide="edit-3" class="w-5 h-5"></i> Chỉnh Sửa Hồ Sơ: {{ item.ho_ten }}
+                {% endif %}
+            </h2>
+            <a href="{% url 'danh_sach_ung_vien' %}" class="text-slate-300 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </a>
+        </div>
+        
+        <form method="POST" class="p-8 space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <h3 class="text-lg font-semibold text-blue-700 border-b border-blue-100 pb-2 mb-4 flex items-center gap-2">
+                    <i data-lucide="user" class="w-4 h-4"></i> Thông Tin Cá Nhân
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Họ và Tên <span class="text-red-500">*</span></label>
+                        <input type="text" name="ho_ten" value="{{ item.ho_ten }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" required placeholder="Nhập họ tên ứng viên">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
+                        <select name="gioi_tinh" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="Nam" {% if item.gioi_tinh == 'Nam' %}selected{% endif %}>Nam</option>
+                            <option value="Nữ" {% if item.gioi_tinh == 'Nữ' %}selected{% endif %}>Nữ</option>
+                            <option value="Khác" {% if item.gioi_tinh == 'Khác' %}selected{% endif %}>Khác</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ngày sinh</label>
+                        <input type="date" name="ngay_sinh" value="{{ item.ngay_sinh|date:'Y-m-d' }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" value="{{ item.email }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="email@example.com">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                        <input type="text" name="sdt" value="{{ item.sdt }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="09xxxxxxxx">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Vị trí ứng tuyển <span class="text-red-500">*</span></label>
+                        <select name="ma_job" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                            <option value="">-- Chọn vị trí --</option>
+                            {% for job in jobs %}
+                                <option value="{{ job.ma_job }}" {% if item.ma_job.ma_job == job.ma_job %}selected{% endif %}>
+                                    {{ job.ma_job }} - {{ job.vi_tri_cong_viec }} ({{ job.maphongban.tenphongban }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <h3 class="text-lg font-semibold text-orange-700 border-b border-orange-100 pb-2 mb-4 flex items-center gap-2">
+                    <i data-lucide="briefcase" class="w-4 h-4"></i> Tiến Trình Tuyển Dụng
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Giai đoạn hiện tại</label>
+                        <select name="giai_doan" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 outline-none">
+                            <option value="Sơ loại" {% if item.giai_doan == 'Sơ loại' %}selected{% endif %}>1. Sơ loại hồ sơ</option>
+                            <option value="Kiểm tra" {% if item.giai_doan == 'Kiểm tra' %}selected{% endif %}>2. Kiểm tra năng lực</option>
+                            <option value="Phỏng vấn" {% if item.giai_doan == 'Phỏng vấn' %}selected{% endif %}>3. Phỏng vấn</option>
+                            <option value="Mời Offer" {% if item.giai_doan == 'Mời Offer' %}selected{% endif %}>4. Mời Offer</option>
+                            <option value="Onboard" {% if item.giai_doan == 'Onboard' %}selected{% endif %}>5. Onboard (Nhận việc)</option>
+                            <option value="Từ chối" {% if item.giai_doan == 'Từ chối' %}selected{% endif %}>6. Từ chối / Loại</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Kết quả / Trạng thái</label>
+                        <select name="trang_thai" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 outline-none">
+                            <option value="Đang xử lý" {% if item.trang_thai == 'Đang xử lý' %}selected{% endif %}>⏳ Đang xử lý</option>
+                            <option value="Tuyển dụng" {% if item.trang_thai == 'Tuyển dụng' %}selected{% endif %}>✅ Tuyển dụng (Đạt)</option>
+                            <option value="Không tuyển" {% if item.trang_thai == 'Không tuyển' %}selected{% endif %}>❌ Không tuyển (Trượt)</option>
+                            <option value="Từ chối offer" {% if item.trang_thai == 'Từ chối offer' %}selected{% endif %}>🚫 Ứng viên từ chối offer</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ngày phỏng vấn (Nếu có)</label>
+                        <input type="date" name="ngay_pv" value="{{ item.ngay_pv|date:'Y-m-d' }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Giờ phỏng vấn</label>
+                        <input type="time" name="gio_pv" value="{{ item.gio_pv|time:'H:i' }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 outline-none">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Địa điểm phỏng vấn / Link Online</label>
+                        <input type="text" name="dia_diem_pv" value="{{ item.dia_diem_pv }}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-orange-500 outline-none" placeholder="VD: Phòng họp 2 hoặc Link Google Meet...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-gray-200 flex justify-end gap-3">
+                <a href="{% url 'danh_sach_ung_vien' %}" class="px-6 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors">
+                    Hủy bỏ
+                </a>
+                <button type="submit" class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-md transition-transform active:scale-95">
+                    {% if is_adding %}Lưu Hồ Sơ{% else %}Cập Nhật{% endif %}
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
